@@ -1,0 +1,6 @@
+worker_id,name,crops_exp,exp_years,korean_level,reentry,can_drive,home_base
+W01,솜싹,배;사과,2,2,true,false,백석읍
+W02,분미,배추,1,1,false,false,백석읍
+W03,캄라,배,3,2,true,true,남면
+W04,톤칸,사과;배추,1,0,false,false,광적면
+W05,완디,배,2,1,true,false,남면

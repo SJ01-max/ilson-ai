@@ -1,0 +1,4 @@
+farm_id,name,township,crops,area_10a,owner_age_group,comm_need
+F01,고령 농가 A,남면,배,15,70대,2
+F02,농가 B,광적면,배추,8,50대,1
+F03,농가 C,백석읍,사과,12,60대,1
