@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-14",
+  "assignments": [
+    { "worker_id": "W01", "worker_name": "솜싹", "farm_id": "F01", "farm_name": "고령 농가 A", "task": "수확", "score": 87, "reason": "배 수확 경험 2년·한국어 중급 → 고령 농가 A 우선" }
+  ],
+  "unassigned_workers": ["W07", "W12"],
+  "unmet_requests": [{ "farm_id": "F09", "shortage": 1 }]
+}

@@ -1,0 +1,11 @@
+{
+  "week_start": "2026-10-12",
+  "days": [
+    { "date": "2026-10-12", "weather": "비",   "demand": 11, "supply": 20, "idle": 9, "loss_krw": 900000 },
+    { "date": "2026-10-13", "weather": "비",   "demand": 11, "supply": 20, "idle": 9, "loss_krw": 900000 },
+    { "date": "2026-10-14", "weather": "맑음", "demand": 17, "supply": 20, "idle": 3, "loss_krw": 300000 },
+    { "date": "2026-10-15", "weather": "맑음", "demand": 20, "supply": 20, "idle": 0, "loss_krw": 0 },
+    { "date": "2026-10-16", "weather": "흐림", "demand": 19, "supply": 20, "idle": 1, "loss_krw": 100000 }
+  ],
+  "week_total": { "idle": 22, "loss_krw": 2200000 }
+}
