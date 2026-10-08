@@ -1,0 +1,65 @@
+{
+  "week_start": "2026-10-12",
+  "days": [
+    {
+      "date": "2026-10-12",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-13",
+      "weather": "비",
+      "demand": 3,
+      "supply": 20,
+      "idle": 17,
+      "loss_krw": 1700000
+    },
+    {
+      "date": "2026-10-14",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-15",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-16",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-17",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-18",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    }
+  ],
+  "week_total": {
+    "idle": 107,
+    "loss_krw": 10700000
+  }
+}
