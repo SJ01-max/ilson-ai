@@ -11,4 +11,5 @@
 | 10/8 | 허성재 | Claude Code로 Streamlit 제거·React 브랜치 머지 | 머지 전후 engine·data·docs 체크섬 대조를 지시해 손상 없음 확인, dashboard 충돌만 React 쪽 선택 | ai-log-img/1008-merge.png |
 | 10/8 | 유정환 | 팀 깃 규칙 CLAUDE.md 작성·커밋·push, 규칙 학습 및 AI 로그 기록 자동화 | feature 브랜치 대신 main에 올라갔는지 git log로 확인, 스크린샷은 PowerShell 캡처로 저장 | img/1008-1.png |
 | 10/8 | 유정환 | feature/dashboard 브랜치 삭제 요청 (팀 규칙: main 단일 브랜치) | 삭제 전 main에 미병합 커밋이 없는지 git log·--merged로 확인 후 로컬·원격 모두 삭제 | img/1008-2.png |
+| 10/8 | 김새영 | forecast: Claude(웹)로 kma_api.py 초안 생성 → Claude Code로 코드 검토 | 격자좌표 미확인·중기예보 공백·저녁 강수 미반영 지적 확인 → 활용가이드 엑셀에서 백석읍 격자(60,132) 추출 적용, 중기예보 공백은 단기예보 우선 로직으로 처리 | (캡처 추가 예정) |
 |  |  |  |  |  |
