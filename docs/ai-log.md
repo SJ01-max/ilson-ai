@@ -12,4 +12,5 @@
 | 10/8 | 유정환 | 팀 깃 규칙 CLAUDE.md 작성·커밋·push, 규칙 학습 및 AI 로그 기록 자동화 | feature 브랜치 대신 main에 올라갔는지 git log로 확인, 스크린샷은 PowerShell 캡처로 저장 | img/1008-1.png |
 | 10/8 | 유정환 | feature/dashboard 브랜치 삭제 요청 (팀 규칙: main 단일 브랜치) | 삭제 전 main에 미병합 커밋이 없는지 git log·--merged로 확인 후 로컬·원격 모두 삭제 | img/1008-2.png |
 | 10/8 | 김새영 | forecast: Claude(웹)로 kma_api.py 초안 생성 → Claude Code 검토 | 문제 8개 발견(격자 미확인·NaN·응답 검증 누락·시간대 등) → 백석읍 격자(60,132) 적용 및 전부 수정 + 오류 시 인증키가 URL째 출력되는 보안 문제 추가 발견·차단 | ai-log-img/1008-3.png |
+| 10/8 | 김새영 | forecast: Claude Code로 유휴 예보 계산(demand·idle) 초안 생성 | 맑은 날 수요가 기대 범위(10~25명)보다 낮은 5명으로 나와 원인 검증 → 작목별 농가 수 합산으로 분모가 중복집계(6,814)된 것 확인, 값을 억지로 맞추지 않고 대안 3개 도출 | ai-log-img/1008-4.png |
 |  |  |  |  |  |
