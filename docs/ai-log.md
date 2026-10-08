@@ -9,4 +9,6 @@
 | 10/7 | 허성재 | scorer.py 재작성 결과 검토 | Claude가 임의 재작성하며 읍면(거리) 가중치와 사유 문장 생성이 누락된 것을 interface.md와 대조해 발견, 보완 지시 | ai-log-img/1007-scorer2.png |
 | 10/8 | 허성재 | Claude Code로 assigner.py 생성 | CP-SAT 결과를 전수 탐색(1024가지)과 대조해 최적값 일치 확인, 수요 초과 케이스를 직접 추가시켜 unmet_requests 동작 검증 | ai-log-img/1008-assigner.png |
 | 10/8 | 허성재 | Claude Code로 Streamlit 제거·React 브랜치 머지 | 머지 전후 engine·data·docs 체크섬 대조를 지시해 손상 없음 확인, dashboard 충돌만 React 쪽 선택 | ai-log-img/1008-merge.png |
+| 10/8 | 유정환 | 팀 깃 규칙 CLAUDE.md 작성·커밋·push, 규칙 학습 및 AI 로그 기록 자동화 | feature 브랜치 대신 main에 올라갔는지 git log로 확인, 스크린샷은 PowerShell 캡처로 저장 | img/1008-1.png |
+| 10/8 | 유정환 | feature/dashboard 브랜치 삭제 요청 (팀 규칙: main 단일 브랜치) | 삭제 전 main에 미병합 커밋이 없는지 git log·--merged로 확인 후 로컬·원격 모두 삭제 | img/1008-2.png |
 |  |  |  |  |  |
