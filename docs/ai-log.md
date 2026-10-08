@@ -12,4 +12,5 @@
 | 10/8 | 유정환 | 팀 깃 규칙 CLAUDE.md 작성·커밋·push, 규칙 학습 및 AI 로그 기록 자동화 | feature 브랜치 대신 main에 올라갔는지 git log로 확인, 스크린샷은 PowerShell 캡처로 저장 | img/1008-1.png |
 | 10/8 | 유정환 | feature/dashboard 브랜치 삭제 요청 (팀 규칙: main 단일 브랜치) | 삭제 전 main에 미병합 커밋이 없는지 git log·--merged로 확인 후 로컬·원격 모두 삭제 | img/1008-2.png |
 | 10/8 | 김새영 | forecast: Claude(웹)로 kma_api.py 초안 생성 → Claude Code로 코드 검토 | 격자좌표 미확인·중기예보 공백·저녁 강수 미반영 지적 확인 → 활용가이드 엑셀에서 백석읍 격자(60,132) 추출 적용, 중기예보 공백은 단기예보 우선 로직으로 처리 | (캡처 추가 예정) |
+| 10/8 | 김새영 | forecast: Claude(웹)로 kma_api.py 초안 생성 → Claude Code 검토 | 문제 8개 발견(격자 미확인·NaN·응답 검증 누락·시간대 등) → 백석읍 격자(60,132) 적용 및 전부 수정 | ai-log-img/1008-3.png |
 |  |  |  |  |  |
