@@ -1,5 +1,7 @@
 pandas
 requests
 ortools
-streamlit
+fastapi
+uvicorn
+mcp
 python-dotenv

@@ -9,6 +9,13 @@ from scorer import load_data, score_table
 def assign(date):
     workers, farms, requests = load_data()
     day_reqs = requests[requests["date"] == date].reset_index(drop=True)
+    if day_reqs.empty:
+        return {
+            "date": date,
+            "assignments": [],
+            "unassigned_workers": sorted(workers["worker_id"]),
+            "unmet_requests": [],
+        }
     table = score_table(workers, farms, day_reqs)
     scores = {(r["worker_id"], r["req_id"]): r for _, r in table.iterrows()}
 
