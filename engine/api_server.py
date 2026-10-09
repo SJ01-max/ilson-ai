@@ -3,12 +3,13 @@
 import json
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from assigner import assign
 
-MOCK_FORECAST = Path(__file__).resolve().parent.parent / "dashboard" / "src" / "mock" / "forecast.json"
+# forecast 모듈(forecast/idle.py) 산출물 — 기상청 API 키 의존을 피하려고 JSON만 읽는다
+IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
 
 app = FastAPI(title="일손배정 AI API")
 app.add_middleware(
@@ -19,10 +20,14 @@ app.add_middleware(
 )
 
 
-# 통합일(10/12)에 forecast 모듈 호출로 교체
 @app.get("/forecast")
 def get_forecast():
-    return json.loads(MOCK_FORECAST.read_text(encoding="utf-8"))
+    if not IDLE_FORECAST.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="forecast 미생성 — python3 forecast/idle.py 먼저 실행",
+        )
+    return json.loads(IDLE_FORECAST.read_text(encoding="utf-8"))
 
 
 @app.get("/assignments")

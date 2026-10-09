@@ -7,12 +7,12 @@ from mcp.server.mcpserver import MCPServer
 
 from assigner import assign
 
-MOCK_FORECAST = Path(__file__).resolve().parent.parent / "dashboard" / "src" / "mock" / "forecast.json"
+# forecast 모듈(forecast/idle.py) 산출물 — 기상청 API 키 의존을 피하려고 JSON만 읽는다
+IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
 
 mcp = MCPServer("ilson-ai")
 
 
-# 통합일(10/12)에 forecast 모듈 호출로 교체
 @mcp.tool()
 def get_idle_forecast() -> dict:
     """이번 주 유휴 인력 예보를 조회한다.
@@ -20,7 +20,9 @@ def get_idle_forecast() -> dict:
     날짜별 날씨·필요 인력(demand)·보유 인력(supply)·유휴 인원(idle)·예상 손실액(loss_krw)과
     주간 합계가 필요할 때 사용한다. 응답 형식: docs/interface.md §3.
     """
-    return json.loads(MOCK_FORECAST.read_text(encoding="utf-8"))
+    if not IDLE_FORECAST.exists():
+        return {"error": "forecast 미생성 — python3 forecast/idle.py 먼저 실행"}
+    return json.loads(IDLE_FORECAST.read_text(encoding="utf-8"))
 
 
 @mcp.tool()
