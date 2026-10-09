@@ -1,6 +1,22 @@
 {
-  "week_start": "2026-10-12",
+  "week_start": "2026-10-10",
   "days": [
+    {
+      "date": "2026-10-10",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
+    {
+      "date": "2026-10-11",
+      "weather": "맑음",
+      "demand": 5,
+      "supply": 20,
+      "idle": 15,
+      "loss_krw": 1500000
+    },
     {
       "date": "2026-10-12",
       "weather": "맑음",
@@ -35,22 +51,6 @@
     },
     {
       "date": "2026-10-16",
-      "weather": "맑음",
-      "demand": 5,
-      "supply": 20,
-      "idle": 15,
-      "loss_krw": 1500000
-    },
-    {
-      "date": "2026-10-17",
-      "weather": "맑음",
-      "demand": 5,
-      "supply": 20,
-      "idle": 15,
-      "loss_krw": 1500000
-    },
-    {
-      "date": "2026-10-18",
       "weather": "맑음",
       "demand": 5,
       "supply": 20,
