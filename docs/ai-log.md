@@ -5,13 +5,14 @@
 | 날짜 | 이름 | AI에게 시킨 것 | 결과를 어떻게 검증·수정했나 | 증거 |
 |---|---|---|---|---|
 | 10/7 | (예시) 허성재 | OR-Tools 배정 제약 코드 초안 생성 | 연속배치 제약이 빠져 있어 직접 추가, 테스트 통과 확인 | img/1007-1.png |
-| 10/7 | 허성재 | Claude Code로 scorer.py 생성 | R002에서 무경험자가 보너스만으로 경험자와 동점이 되는 문제를 발견, 경험 없을 시 보너스 절반 감액 규칙을 지시해 수정 | ai-log-img/1007-scorer.png |
-| 10/7 | 허성재 | scorer.py 재작성 결과 검토 | Claude가 임의 재작성하며 읍면(거리) 가중치와 사유 문장 생성이 누락된 것을 interface.md와 대조해 발견, 보완 지시 | ai-log-img/1007-scorer2.png |
-| 10/8 | 허성재 | Claude Code로 assigner.py 생성 | CP-SAT 결과를 전수 탐색(1024가지)과 대조해 최적값 일치 확인, 수요 초과 케이스를 직접 추가시켜 unmet_requests 동작 검증 | ai-log-img/1008-assigner.png |
-| 10/8 | 허성재 | Claude Code로 Streamlit 제거·React 브랜치 머지 | 머지 전후 engine·data·docs 체크섬 대조를 지시해 손상 없음 확인, dashboard 충돌만 React 쪽 선택 | ai-log-img/1008-merge.png |
+| 10/7 | 허성재 | Claude Code로 scorer.py 생성 | R002에서 무경험자가 보너스만으로 경험자와 동점이 되는 문제를 발견, 경험 없을 시 보너스 절반 감액 규칙을 지시해 수정 | 75f9a2a |
+| 10/7 | 허성재 | scorer.py 재작성 결과 검토 | Claude가 임의 재작성하며 읍면(거리) 가중치와 사유 문장 생성이 누락된 것을 interface.md와 대조해 발견, 보완 지시 | 75f9a2a |
+| 10/8 | 허성재 | Claude Code로 assigner.py 생성 | CP-SAT 결과를 전수 탐색(1024가지)과 대조해 최적값 일치 확인, 수요 초과 케이스를 직접 추가시켜 unmet_requests 동작 검증 | 56b1145 |
+| 10/8 | 허성재 | Claude Code로 Streamlit 제거·React 브랜치 머지 | 머지 전후 engine·data·docs 체크섬 대조를 지시해 손상 없음 확인, dashboard 충돌만 React 쪽 선택 | 58a4baa |
 | 10/8 | 유정환 | 팀 깃 규칙 CLAUDE.md 작성·커밋·push, 규칙 학습 및 AI 로그 기록 자동화 | feature 브랜치 대신 main에 올라갔는지 git log로 확인, 스크린샷은 PowerShell 캡처로 저장 | img/1008-1.png |
 | 10/8 | 유정환 | feature/dashboard 브랜치 삭제 요청 (팀 규칙: main 단일 브랜치) | 삭제 전 main에 미병합 커밋이 없는지 git log·--merged로 확인 후 로컬·원격 모두 삭제 | img/1008-2.png |
 | 10/8 | 김새영 | forecast: Claude(웹)로 kma_api.py 초안 생성 → Claude Code 검토 | 문제 8개 발견(격자 미확인·NaN·응답 검증 누락·시간대 등) → 백석읍 격자(60,132) 적용 및 전부 수정 + 오류 시 인증키가 URL째 출력되는 보안 문제 추가 발견·차단 | ai-log-img/1008-3.png |
 | 10/8 | 김새영 | forecast: Claude Code로 유휴 예보 계산(demand·idle) 초안 생성 | 맑은 날 수요가 기대 범위(10~25명)보다 낮은 5명으로 나와 원인 검증 → 작목별 농가 수 합산으로 분모가 중복집계(6,814)된 것 확인, 값을 억지로 맞추지 않고 대안 3개 도출 | ai-log-img/1008-4.png |
-| 10/8 | 허성재 | cc로 forecast 실데이터 연결 | 새영 산출물의 §3 형식 일치를 키 단위 대조 후 교체, week_total 값으로 연결 검증 | ai-log-img/1008-forecast.png |
-|  |  |  |  |  |
+| 10/8 | 허성재 | cc로 forecast 실데이터 연결 | 새영 산출물의 §3 형식 일치를 키 단위 대조 후 교체, week_total 값으로 연결 검증 | ee0d4b2 |
+| 10/9 | 허성재 | 디자인 스킬(design-taste-frontend)로 대시보드 4회 반복 개선 | 매회 렌더링을 직접 확인하며 방향 재지시 — 다크 모드 막대 묻힘·"강수" 라벨 잘림을 발견해 수정시킴, 수요 막대를 파랑·빨강으로 바꾸자는 안은 색 의미 충돌(빨강=유휴, 파랑=강수 예약)을 근거로 반려하고 틸 채택, 사이드바 도입은 메뉴 3개·시연 프로젝터 환경 근거로 기각 | f03dd2c |
+| 10/9 | 허성재 | cc로 로그인 API 추가 (진행 중) | 해시+솔트 저장, MCP는 로컬 권한 기반이라 로그인 밖에 두는 설계를 지시 | (진행 중) |
