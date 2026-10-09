@@ -28,14 +28,17 @@ export default function ForecastPage() {
 
   return (
     <div className="stack">
-      <Headline headline={headline} forecast={forecast} />
-      <SummaryCards forecast={forecast} headline={headline} />
+      <section className="card hero">
+        <h2>주간 요약</h2>
+        <SummaryCards forecast={forecast} headline={headline} />
+        <Headline headline={headline} forecast={forecast} />
+      </section>
       <section className="card">
-        <h2>요일별 수요 vs 공급</h2>
+        <h2>일별 추이</h2>
         <DemandSupplyChart rows={rows} />
       </section>
       <section className="card">
-        <h2>요일별 상세</h2>
+        <h2>상세 내역</h2>
         <ForecastTable rows={rows} total={forecast.week_total} />
       </section>
     </div>

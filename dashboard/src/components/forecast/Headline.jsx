@@ -7,13 +7,13 @@ import { shortDate } from '../../utils/forecast.js';
 export default function Headline({ headline, forecast }) {
   const last = forecast.days.at(-1)?.date;
   return (
-    <section className="card headline">
+    <section className="headline">
       <div className="eyebrow">주간 유휴 예보 · {shortDate(forecast.week_start)}{last && ` ~ ${shortDate(last)}`}</div>
       <p className="text" aria-label={headline.text}>
         {headline.parts.map((p, i) => (
           <span key={p}>
             {i > 0 && <span className="arrow" aria-hidden="true">→ </span>}
-            <span className={i === 2 ? 'part--loss' : undefined}>{p}</span>
+            <span className={i >= 1 ? 'part--loss' : undefined}>{p}</span>
           </span>
         ))}
       </p>

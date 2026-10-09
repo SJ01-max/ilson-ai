@@ -1,7 +1,5 @@
 import { toMan } from '../../utils/forecast.js';
 
-const WEATHER_ICON = { 비: '🌧️', 맑음: '☀️', 흐림: '☁️', 눈: '❄️', 소나기: '🌦️' };
-
 export default function ForecastTable({ rows, total }) {
   return (
     <div className="table-wrap">
@@ -23,15 +21,14 @@ export default function ForecastTable({ rows, total }) {
                 {r.date} ({r.weekday})
               </td>
               <td className="left">
-                <span className="weather-chip">
-                  <span aria-hidden="true">{WEATHER_ICON[r.weather] ?? '🌡️'}</span>
+                <span className={r.rainy ? 'weather-chip weather-chip--rain' : 'weather-chip'}>
                   {r.weather}
                 </span>
               </td>
               <td>{r.demand}</td>
               <td>{r.supply}</td>
-              <td className={r.idle > 0 ? 'idle-pos' : undefined}>{r.idle}</td>
-              <td>{toMan(r.loss_krw)}</td>
+              <td className={r.idle > 0 ? 'num-warn' : undefined}>{r.idle}</td>
+              <td className={r.loss_krw > 0 ? 'num-warn' : undefined}>{toMan(r.loss_krw)}</td>
             </tr>
           ))}
           {total && (
@@ -40,8 +37,8 @@ export default function ForecastTable({ rows, total }) {
               <td className="left" />
               <td>{rows.reduce((s, r) => s + r.demand, 0)}</td>
               <td>{rows.reduce((s, r) => s + r.supply, 0)}</td>
-              <td>{total.idle}</td>
-              <td>{toMan(total.loss_krw)}</td>
+              <td className="num-warn">{total.idle}</td>
+              <td className="num-warn">{toMan(total.loss_krw)}</td>
             </tr>
           )}
         </tbody>
