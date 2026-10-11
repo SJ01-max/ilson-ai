@@ -3,21 +3,45 @@ import Tabs from './components/Tabs.jsx';
 import ForecastPage from './pages/ForecastPage.jsx';
 import AssignmentBoardPage from './pages/AssignmentBoardPage.jsx';
 import ScenarioPage from './pages/ScenarioPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import { logout } from './api/auth.js';
+import { getDisplayName, getToken, UNAUTHORIZED_EVENT } from './api/client.js';
 
 const TABS = [
   { id: 'forecast', label: '유휴 예보' },
-  { id: 'board', label: '배정 보드', badge: '준비 중' },
-  { id: 'scenario', label: '시나리오 비교', badge: '준비 중' },
+  { id: 'board', label: '배정 보드' },
+  { id: 'scenario', label: '시나리오 비교' },
 ];
 
 export default function App() {
   const [tab, setTab] = useState('forecast');
   const [dark, setDark] = useState(false);
   const [mcpOpen, setMcpOpen] = useState(false);
+  const [session, setSession] = useState(() =>
+    getToken() ? { token: getToken(), display_name: getDisplayName() } : null,
+  );
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   }, [dark]);
+
+  // 서버 재시작 등으로 토큰이 무효가 되면(401) 로그인 화면으로
+  useEffect(() => {
+    const onUnauthorized = () => setSession(null);
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+  }, []);
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      setSession(null);
+      setTab('forecast');
+    }
+  }
+
+  if (!session) return <LoginPage onLogin={setSession} />;
 
   const today = new Date().toLocaleDateString('ko-KR', {
     year: 'numeric',
@@ -61,6 +85,12 @@ export default function App() {
             onClick={() => setDark((v) => !v)}
           >
             {dark ? '라이트' : '다크'}
+          </button>
+          <span className="user-chip" title="로그인 계정">
+            {session.display_name || '담당자'}
+          </span>
+          <button type="button" className="text-btn" onClick={handleLogout}>
+            로그아웃
           </button>
         </div>
       </header>

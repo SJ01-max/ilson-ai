@@ -114,6 +114,8 @@ body {
 .card h2 { font-size: 13px; margin: 0 0 16px; color: var(--text-muted); font-weight: 600; }
 
 .stack { display: grid; gap: 16px; }
+/* grid 자식은 min-width:auto 라 표·타일이 카드를 밀어 가로 스크롤을 만든다 → 0으로 */
+.stack > * { min-width: 0; }
 
 /* ── 히어로: 주간 요약 (결론 한 덩어리) ── */
 .hero { border-color: var(--border); }
@@ -190,4 +192,108 @@ td.num-warn { color: var(--status-critical); font-weight: 600; }
   .headline .text { font-size: 15px; }
   th, td { padding: 8px 10px; }
   .chart-wrap { height: 240px; }
+}
+
+/* ── 로그인 ───────────────────────────── */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { width: 100%; max-width: 360px; border-color: var(--border); }
+.login-card h1 { font-size: 20px; margin: 0; }
+.login-sub { color: var(--text-2); font-size: 13px; margin: 4px 0 20px; }
+.field { display: block; margin-bottom: 14px; }
+.field span { display: block; font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+.field input {
+  width: 100%; font: inherit; padding: 9px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--page); color: var(--text-1);
+}
+.field input:focus { outline: 2px solid var(--series-demand); outline-offset: 1px; border-color: transparent; }
+.form-error { color: var(--status-critical); font-size: 13px; margin: 0 0 12px; }
+.primary-btn {
+  width: 100%; appearance: none; cursor: pointer; font: inherit; font-weight: 600;
+  padding: 10px 14px; border-radius: 8px; border: 0;
+  background: var(--text-1); color: var(--page);
+}
+.primary-btn:disabled { opacity: 0.45; cursor: default; }
+.login-hint { font-size: 12px; color: var(--text-muted); margin: 14px 0 0; }
+.user-chip { font-size: 12px; color: var(--text-2); padding: 3px 10px; border-radius: 999px; background: var(--border-soft); }
+
+/* ── 요약 타일 변형 ─────────────────────── */
+.summary--3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.stat--neutral { background: var(--surface); box-shadow: inset 4px 0 0 var(--axis); }
+
+/* ── 배정 보드: 날짜 선택 ───────────────── */
+.date-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 16px 24px; }
+.date-field { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
+.date-field input {
+  font: inherit; padding: 6px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--page); color: var(--text-1);
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-btn {
+  appearance: none; cursor: pointer; font: inherit; font-size: 12px;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
+}
+.chip-btn:hover { color: var(--text-1); border-color: var(--axis); }
+.chip-btn[aria-pressed='true'] { background: var(--text-1); color: var(--page); border-color: var(--text-1); }
+.is-loading { opacity: 0.55; transition: opacity 0.15s; }
+
+/* ── 배정 보드: 농가 카드 ────────────────── */
+.farm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.farm-card { border: 1px solid var(--border); border-radius: 8px; padding: 16px; background: var(--surface); }
+.farm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+.farm-head h3 { font-size: 15px; margin: 0; }
+.farm-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.farm-count { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.farm-count .count { font-weight: 700; font-variant-numeric: tabular-nums; }
+.farm-empty, .empty { color: var(--text-muted); font-size: 13px; margin: 0; }
+.worker-list { list-style: none; margin: 0; padding: 0; }
+.worker { padding: 10px 0; border-top: 1px solid var(--border-soft); }
+.worker:first-child { border-top: 0; padding-top: 0; }
+.worker-main { display: flex; align-items: baseline; gap: 8px; }
+.worker-name { font-weight: 600; }
+.worker-id { font-size: 12px; color: var(--text-muted); }
+.score { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.score small { font-size: 11px; font-weight: 500; color: var(--text-2); margin-left: 2px; }
+.worker-reason { margin: 4px 0 0; font-size: 12.5px; color: var(--text-2); line-height: 1.45; }
+
+.chip {
+  display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-2); background: var(--surface);
+}
+.chip--warn, .chip--idle {
+  color: var(--status-critical); border-color: color-mix(in srgb, var(--status-critical) 35%, transparent);
+  background: color-mix(in srgb, var(--status-critical) 6%, var(--surface)); font-weight: 600;
+}
+.id-chips { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.leftovers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 24px; }
+.leftovers-label { font-size: 13px; color: var(--text-2); }
+.leftovers-label b { font-variant-numeric: tabular-nums; }
+
+/* ── 시나리오: 슬라이더 ─────────────────── */
+.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px 32px; }
+.slider { display: block; }
+.slider-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
+.slider-head b { color: var(--text-1); font-size: 15px; font-variant-numeric: tabular-nums; }
+.slider input[type='range'] { width: 100%; accent-color: var(--text-1); margin: 0; }
+.slider-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.note {
+  margin: 16px 0 0; padding: 8px 12px; font-size: 12.5px; color: var(--text-2);
+  border: 1px dashed var(--border); border-radius: 8px; background: var(--page);
+}
+.chart-wrap--short { height: 240px; }
+
+/* ── 반응형 375px (배정 보드·시나리오·로그인) ── */
+@media (max-width: 480px) {
+  .header-side { width: 100%; justify-content: space-between; }
+  .header-meta { display: none; }
+  .tabs { overflow-x: auto; }
+  .tab { padding: 10px 10px; white-space: nowrap; }
+  .summary--3 { grid-template-columns: 1fr; }
+  .date-bar { padding: 14px 16px; }
+  .date-field { width: 100%; justify-content: space-between; }
+  .farm-grid { grid-template-columns: 1fr; }
+  .farm-card { padding: 14px; }
+  .sliders { grid-template-columns: 1fr; }
+  .chart-wrap--short { height: 200px; }
+  .login-card { padding: 20px; }
 }
