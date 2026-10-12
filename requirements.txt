@@ -5,3 +5,4 @@ fastapi
 uvicorn
 mcp
 python-dotenv
+anthropic

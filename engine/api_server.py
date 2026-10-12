@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from assigner import assign
 from scenario import compare as compare_scenario
+from chat_server import build_router as build_chat_router
 
 IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
 AUTH_MOCK = Path(__file__).resolve().parent / "auth_mock.json"
@@ -102,3 +103,7 @@ def get_scenario(
         return compare_scenario(workers, start)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+# 애드온: ANTHROPIC_API_KEY 없으면 /chat 요청만 503, 나머지 기능 무영향
+app.include_router(build_chat_router(require_auth))
