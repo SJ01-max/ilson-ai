@@ -22,3 +22,4 @@
 | 10/12 | 유정환 | cc로 10/11 push 여부와 코드 반영 확인, 미사용 mock 데이터 삭제 | 커밋 목록만 본 1차 답변을 반려하고 origin/main 코드를 직접 열어 Bearer·401 처리, 로그인 폼, mock 참조 없음을 확인시킴, npm run build 재실행 통과 후 mock json 2개 삭제 커밋 | e5a075f |
 | 10/12 | 허성재 | cc(Opus)로 시나리오 비교 엔진 구현 | 자기일치 테스트(workers=20, start=None → diff=0)와 workers=25 손계산 대조(일별 idle=11×7=77, loss 770만, util 0.56)로 검증, 수요는 §3 보정값을 재사용하도록 지시해 이중 계산 방지, workers 경계(5~50) ValueError·주 시작 전/중간/끝 이후 start 규칙까지 실제 호출로 확인, curl /scenario와 MCP tools/call compare_scenario 둘 다 동일 응답 | 89ecffc |
 | 10/12 | 허성재 | cc(Opus)에게 시나리오 엔진 보완안을 받되 §5 필드·용어 수정만 선별 수용 | AI가 함께 제안한 상태 저장(즐겨찾기 시나리오)·일별 상세 비교 반환은 데모 범위를 넘고 상태 관리 복잡도가 커서 로드맵으로 이연, 반면 unmet 필드와 "유휴 인건비 환산액" 명명은 workers=10에서 utilization=1.00·idle=0인데 unmet=28이 뜨는 함정 케이스를 응답 자체가 드러내므로 수용, interface.md §5·docstring·CLAUDE.md 핵심 사실까지 일괄 반영 후 /scenario·MCP 둘 다 unmet 포함 응답 재확인 | 2022c53 |
+| 10/12 | 허성재 | 개선 피드백 2건 검토 | 상태 관리가 필요한 기능(요청 등록·확정·재배정)은 D-3 일정 근거로 로드맵 이연, 일관성·명명·효과 측정만 선별 수용 | 3bbc932 |
