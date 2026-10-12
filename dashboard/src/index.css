@@ -20,6 +20,8 @@
 
   --status-critical: #b93434;
   --status-good: #006300;
+  /* 주황 = 수요 미충족(unmet): 유휴(빨강)와 구분해 "일손이 모자람"을 시각화 */
+  --status-unmet: #c2550a;
 
   --radius: 12px;
   --font: 'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
@@ -45,6 +47,7 @@
     --rain-row: rgba(57, 135, 229, 0.14);
     --status-critical: #e06363;
     --status-good: #0ca30c;
+    --status-unmet: #e49458;
 }
 
 * { box-sizing: border-box; }
@@ -218,7 +221,16 @@ td.num-warn { color: var(--status-critical); font-weight: 600; }
 
 /* ── 요약 타일 변형 ─────────────────────── */
 .summary--3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.summary--4 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 .stat--neutral { background: var(--surface); box-shadow: inset 4px 0 0 var(--axis); }
+/* 수요 미충족 — 주황 톤 (유휴 빨강과 구분) */
+.stat--unmet {
+  background: color-mix(in srgb, var(--status-unmet) 4%, var(--surface));
+  box-shadow: inset 4px 0 0 var(--status-unmet);
+}
+.stat .value--unmet { color: var(--status-unmet); }
+.headline .part--unmet { color: var(--status-unmet); }
+td.num-unmet { color: var(--status-unmet); font-weight: 600; }
 
 /* ── 배정 보드: 날짜 선택 ───────────────── */
 .date-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 16px 24px; }
@@ -289,6 +301,7 @@ td.num-warn { color: var(--status-critical); font-weight: 600; }
   .tabs { overflow-x: auto; }
   .tab { padding: 10px 10px; white-space: nowrap; }
   .summary--3 { grid-template-columns: 1fr; }
+  .summary--4 { grid-template-columns: 1fr 1fr; }
   .date-bar { padding: 14px 16px; }
   .date-field { width: 100%; justify-content: space-between; }
   .farm-grid { grid-template-columns: 1fr; }

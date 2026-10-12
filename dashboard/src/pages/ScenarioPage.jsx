@@ -1,28 +1,35 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getForecast } from '../api/forecast.js';
-import { estimateScenario } from '../utils/scenario.js';
+import { getScenario } from '../api/scenario.js';
 import { formatManWon, isRainy, shortDate, toMan, weekdayOf } from '../utils/forecast.js';
 import ScenarioChart from '../components/scenario/ScenarioChart.jsx';
 
 const WORKERS_MIN = 5;
-const WORKERS_MAX = 40;
+const WORKERS_MAX = 50;
+const BASE_WORKERS = 20;
+const WAGE_KRW = 100_000;
+const DEBOUNCE_MS = 300;
 
 /**
- * 화면 3: 시나리오 비교 — 슬라이더(입국 인원·투입 시기) + 결과 영역.
- * 결과 수치는 현재 utils/scenario.js 의 임시 추정이다. 성재의 compare_scenario 엔진이
- * 올라오면 estimateScenario() 호출 자리를 API 호출로 바꾼다 (화면 레이아웃은 그대로).
+ * 화면 3: 시나리오 비교 — 슬라이더(입국 인원·투입 시기) → GET /scenario → 요약·차트·표.
+ * 주간 집계(idle/unmet/loss_krw/utilization)는 엔진 응답을 그대로 쓰고,
+ * 일별 차트는 엔진과 동일한 공급 규칙(start 기준)으로 재구성한다 — 이중 계산이 아니라 동일 규칙 전개.
  */
 export default function ScenarioPage() {
   const [forecast, setForecast] = useState(null);
-  const [error, setError] = useState(null);
-  const [workers, setWorkers] = useState(20);
+  const [forecastError, setForecastError] = useState(null);
+  const [workers, setWorkers] = useState(BASE_WORKERS);
   const [startIdx, setStartIdx] = useState(0);
+  const [result, setResult] = useState(null);
+  const [scenarioError, setScenarioError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
     getForecast()
       .then((data) => alive && setForecast(data))
-      .catch((e) => alive && setError(e));
+      .catch((e) => alive && setForecastError(e));
     return () => {
       alive = false;
     };
@@ -30,21 +37,68 @@ export default function ScenarioPage() {
 
   const days = forecast?.days ?? [];
   const start = days[Math.min(startIdx, Math.max(days.length - 1, 0))]?.date;
-  const baseSupply = days[0]?.supply ?? 20;
 
-  const est = useMemo(() => (forecast && start ? estimateScenario(forecast, { workers, start }) : null), [forecast, workers, start]);
+  useEffect(() => {
+    if (!forecast || !start) return undefined;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setLoading(true);
+    timerRef.current = setTimeout(() => {
+      let alive = true;
+      getScenario(workers, start)
+        .then((data) => {
+          if (!alive) return;
+          setResult(data);
+          setScenarioError(null);
+        })
+        .catch((e) => alive && setScenarioError(e))
+        .finally(() => alive && setLoading(false));
+      return () => {
+        alive = false;
+      };
+    }, DEBOUNCE_MS);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [forecast, workers, start]);
 
-  if (error) return <div className="card state error">예보를 불러오지 못했습니다: {String(error.message ?? error)}</div>;
-  if (!forecast || !est) return <div className="card state">예보 불러오는 중…</div>;
+  const rows = useMemo(() => {
+    if (!forecast || !start) return [];
+    return days.map((d) => {
+      const supply = d.date >= start ? workers : BASE_WORKERS;
+      const idle = Math.max(supply - d.demand, 0);
+      const shortage = Math.max(d.demand - supply, 0);
+      return {
+        date: d.date,
+        weather: d.weather,
+        weekday: weekdayOf(d.date),
+        label: `${weekdayOf(d.date)} ${shortDate(d.date)}`,
+        rainy: isRainy(d.weather),
+        demand: d.demand,
+        base_supply: BASE_WORKERS,
+        base_idle: d.idle,
+        supply,
+        idle,
+        shortage,
+        loss_krw: idle * WAGE_KRW,
+      };
+    });
+  }, [forecast, workers, start, days]);
 
-  const rows = est.days.map((d) => ({
-    ...d,
-    weekday: weekdayOf(d.date),
-    label: `${weekdayOf(d.date)} ${shortDate(d.date)}`,
-    rainy: isRainy(d.weather),
-  }));
-  const dIdle = est.total.idle - est.base_total.idle;
-  const dLoss = est.total.loss_krw - est.base_total.loss_krw;
+  if (forecastError) {
+    return (
+      <div className="card state error">예보를 불러오지 못했습니다: {String(forecastError.message ?? forecastError)}</div>
+    );
+  }
+  if (!forecast) return <div className="card state">예보 불러오는 중…</div>;
+
+  if (scenarioError && !result) {
+    return (
+      <div className="card state error">시나리오를 불러오지 못했습니다: {String(scenarioError.message ?? scenarioError)}</div>
+    );
+  }
+  if (!result) return <div className="card state">시나리오 계산 중…</div>;
+
+  const { base, scenario, diff } = result;
   const sign = (n) => (n > 0 ? `+${n}` : `${n}`);
 
   return (
@@ -68,7 +122,7 @@ export default function ScenarioPage() {
             />
             <div className="slider-scale">
               <span>{WORKERS_MIN}명</span>
-              <span>현재 {baseSupply}명</span>
+              <span>현재 {BASE_WORKERS}명</span>
               <span>{WORKERS_MAX}명</span>
             </div>
           </label>
@@ -95,39 +149,48 @@ export default function ScenarioPage() {
             </div>
           </label>
         </div>
-        <p className="note" role="note">
-          계산 엔진(compare_scenario) 연결 대기 중 — 아래 수치는 화면 확인용 임시 추정(공급 − 수요)입니다.
-        </p>
       </section>
 
-      <section className="card hero">
+      <section className={loading ? 'card hero is-loading' : 'card hero'} aria-busy={loading}>
         <h2>결과 요약 · 현재 vs 시나리오</h2>
-        <div className="summary summary--3">
+        <div className="summary summary--4">
           <section className="stat">
             <div className="label">주간 유휴 인일</div>
             <div className="value value--warn">
-              {est.total.idle}
+              {scenario.idle}
               <small>인일</small>
             </div>
             <div className="hint">
-              현재 {est.base_total.idle}인일 · {sign(dIdle)}
+              현재 {base.idle}인일 · {sign(diff.idle)}
             </div>
           </section>
           <section className="stat">
             <div className="label">주간 손실액</div>
-            <div className="value value--warn">{formatManWon(est.total.loss_krw)}</div>
+            <div className="value value--warn">{formatManWon(scenario.loss_krw)}</div>
             <div className="hint">
-              현재 {formatManWon(est.base_total.loss_krw)} · {dLoss > 0 ? '+' : dLoss < 0 ? '−' : ''}
-              {formatManWon(Math.abs(dLoss))}
+              현재 {formatManWon(base.loss_krw)} · {diff.loss_krw > 0 ? '+' : diff.loss_krw < 0 ? '−' : ''}
+              {formatManWon(Math.abs(diff.loss_krw))}
             </div>
           </section>
-          <section className={est.total.shortage > 0 ? 'stat' : 'stat stat--neutral'}>
-            <div className="label">인력 부족 (수요 &gt; 공급)</div>
-            <div className={est.total.shortage > 0 ? 'value value--warn' : 'value'}>
-              {est.total.shortage}
+          <section className={scenario.unmet > 0 ? 'stat stat--unmet' : 'stat stat--neutral'}>
+            <div className="label">수요 미충족(인일)</div>
+            <div className={scenario.unmet > 0 ? 'value value--unmet' : 'value'}>
+              {scenario.unmet}
               <small>인일</small>
             </div>
-            <div className="hint">투입 전·소수 인원일 때 발생</div>
+            <div className="hint">
+              현재 {base.unmet}인일 · {sign(diff.unmet)}
+            </div>
+          </section>
+          <section className="stat stat--neutral">
+            <div className="label">가동률</div>
+            <div className="value">
+              {Math.round(scenario.utilization * 100)}
+              <small>%</small>
+            </div>
+            <div className="hint">
+              현재 {Math.round(base.utilization * 100)}% · unmet &gt; 0이면 수요 미충족
+            </div>
           </section>
         </div>
         <div className="headline">
@@ -139,14 +202,22 @@ export default function ScenarioPage() {
             <span className="arrow" aria-hidden="true">
               →
             </span>
-            <span className="part--loss">유휴 {est.total.idle}인일</span>
+            <span className="part--loss">유휴 {scenario.idle}인일</span>
             <span className="arrow" aria-hidden="true">
               →
             </span>
-            <span className="part--loss">손실 {formatManWon(est.total.loss_krw)}</span>
+            <span className="part--loss">손실 {formatManWon(scenario.loss_krw)}</span>
+            {scenario.unmet > 0 && (
+              <>
+                <span className="arrow" aria-hidden="true">
+                  →
+                </span>
+                <span className="part--unmet">수요 미충족 {scenario.unmet}인일</span>
+              </>
+            )}
           </p>
           <div className="meta">
-            현재 기준(공급 {baseSupply}명 고정) 대비 유휴 {sign(dIdle)}인일
+            현재 기준(공급 {BASE_WORKERS}명 고정) 대비 유휴 {sign(diff.idle)}인일 · 미충족 {sign(diff.unmet)}인일
           </div>
         </div>
       </section>
@@ -187,7 +258,7 @@ export default function ScenarioPage() {
                   <td className={r.idle > 0 ? 'num-warn' : undefined}>
                     {r.base_idle} → {r.idle}
                   </td>
-                  <td className={r.shortage > 0 ? 'num-warn' : undefined}>{r.shortage}</td>
+                  <td className={r.shortage > 0 ? 'num-unmet' : undefined}>{r.shortage}</td>
                   <td className={r.loss_krw > 0 ? 'num-warn' : undefined}>{toMan(r.loss_krw)}</td>
                 </tr>
               ))}
@@ -197,10 +268,10 @@ export default function ScenarioPage() {
                 <td>{rows.reduce((s, r) => s + r.demand, 0)}</td>
                 <td />
                 <td className="num-warn">
-                  {est.base_total.idle} → {est.total.idle}
+                  {base.idle} → {scenario.idle}
                 </td>
-                <td className="num-warn">{est.total.shortage}</td>
-                <td className="num-warn">{toMan(est.total.loss_krw)}</td>
+                <td className={scenario.unmet > 0 ? 'num-unmet' : undefined}>{scenario.unmet}</td>
+                <td className="num-warn">{toMan(scenario.loss_krw)}</td>
               </tr>
             </tbody>
           </table>
