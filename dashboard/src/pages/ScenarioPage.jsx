@@ -165,7 +165,7 @@ export default function ScenarioPage() {
             </div>
           </section>
           <section className="stat">
-            <div className="label">주간 손실액</div>
+            <div className="label">주간 유휴 인건비 환산액(예상)</div>
             <div className="value value--warn">{formatManWon(scenario.loss_krw)}</div>
             <div className="hint">
               현재 {formatManWon(base.loss_krw)} · {diff.loss_krw > 0 ? '+' : diff.loss_krw < 0 ? '−' : ''}
@@ -206,7 +206,7 @@ export default function ScenarioPage() {
             <span className="arrow" aria-hidden="true">
               →
             </span>
-            <span className="part--loss">손실 {formatManWon(scenario.loss_krw)}</span>
+            <span className="part--loss">환산액 {formatManWon(scenario.loss_krw)}</span>
             {scenario.unmet > 0 && (
               <>
                 <span className="arrow" aria-hidden="true">
@@ -239,7 +239,7 @@ export default function ScenarioPage() {
                 <th>공급 현재→시나리오</th>
                 <th>유휴 현재→시나리오</th>
                 <th>부족(명)</th>
-                <th>손실액(만 원)</th>
+                <th>환산액(만 원)</th>
               </tr>
             </thead>
             <tbody>

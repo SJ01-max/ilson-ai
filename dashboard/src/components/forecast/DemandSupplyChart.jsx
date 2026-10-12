@@ -24,7 +24,7 @@ function ChartTooltip({ active, payload }) {
       <div className="t-row"><span>수요</span><b>{d.demand}명</b></div>
       <div className="t-row"><span>공급</span><b>{d.supply}명</b></div>
       <div className="t-row"><span>유휴</span><b>{d.idle}인일</b></div>
-      <div className="t-row"><span>손실</span><b>{formatManWon(d.loss_krw)}</b></div>
+      <div className="t-row"><span>환산액</span><b>{formatManWon(d.loss_krw)}</b></div>
     </div>
   );
 }

@@ -24,14 +24,13 @@ function ChartTooltip({ active, payload }) {
       <div className="t-row"><span>공급 현재 → 시나리오</span><b>{d.base_supply} → {d.supply}명</b></div>
       <div className="t-row"><span>유휴 현재 → 시나리오</span><b>{d.base_idle} → {d.idle}인일</b></div>
       {d.shortage > 0 && <div className="t-row"><span>부족</span><b>{d.shortage}명</b></div>}
-      <div className="t-row"><span>손실(시나리오)</span><b>{formatManWon(d.loss_krw)}</b></div>
+      <div className="t-row"><span>환산액(시나리오)</span><b>{formatManWon(d.loss_krw)}</b></div>
     </div>
   );
 }
 
 /**
- * 날짜별 유휴 비교: 현재(윤곽선) vs 시나리오(빨강 채움). 빨강=유휴·손실 전용, 강수일은 파랑 밴드.
- * rows: estimateScenario().days + label/rainy
+ * 날짜별 유휴 비교: 현재(윤곽선) vs 시나리오(빨강 채움). 빨강=유휴·유휴 인건비 환산액, 강수일은 파랑 밴드.
  */
 export default function ScenarioChart({ rows }) {
   const warnColor = css('--status-critical') || '#b93434';

@@ -16,9 +16,9 @@ export default function SummaryCards({ forecast, headline }) {
         </div>
       </section>
       <section className="stat">
-        <div className="label">주간 손실액 합계</div>
+        <div className="label">주간 유휴 인건비 환산액(예상)</div>
         <div className="value value--warn">{formatManWon(loss_krw)}</div>
-        <div className="hint">강수일 손실 {formatManWon(headline.lossKrw)}</div>
+        <div className="hint">강수일 환산액 {formatManWon(headline.lossKrw)}</div>
       </section>
     </div>
   );

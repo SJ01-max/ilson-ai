@@ -27,7 +27,11 @@ export default function FarmCard({ farm }) {
               <div className="worker-main">
                 <span className="worker-name">{w.worker_name}</span>
                 <span className="worker-id">{w.worker_id}</span>
-                <span className="score" aria-label={`점수 ${w.score}점`}>
+                <span
+                  className="score"
+                  aria-label={`배정 적합도 가중점수 ${w.score}점`}
+                  title="배정 적합도 가중점수 (작목·경력·한국어·재입국·운전·읍면)"
+                >
                   {w.score}
                   <small>점</small>
                 </span>

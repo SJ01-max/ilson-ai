@@ -1,7 +1,7 @@
 import { shortDate, weekdayOf } from '../../utils/forecast.js';
 
 /**
- * 배정 요약 — 결론 먼저. 배정 인원은 중립, 미배정(유휴)·부족은 빨강(손실 의미).
+ * 배정 요약 — 결론 먼저. 배정 인원은 중립, 미배정(유휴)·부족은 빨강(유휴 인건비 환산액 의미).
  */
 export default function BoardSummary({ date, summary }) {
   const { assigned, unassigned, shortage, farms } = summary;
@@ -10,7 +10,7 @@ export default function BoardSummary({ date, summary }) {
     <>
       <div className="summary summary--3">
         <section className="stat stat--neutral">
-          <div className="label">배정 완료</div>
+          <div className="label">추천 배정</div>
           <div className="value">
             {assigned}
             <small>명</small>

@@ -11,7 +11,7 @@ export default function ForecastTable({ rows, total }) {
             <th>수요(명)</th>
             <th>공급(명)</th>
             <th>유휴(인일)</th>
-            <th>손실액(만 원)</th>
+            <th>환산액(만 원)</th>
           </tr>
         </thead>
         <tbody>
