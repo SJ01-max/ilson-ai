@@ -6,6 +6,7 @@ from pathlib import Path
 from mcp.server.mcpserver import MCPServer
 
 from assigner import assign
+from scenario import compare
 
 # forecast 모듈(forecast/idle.py) 산출물 — 기상청 API 키 의존을 피하려고 JSON만 읽는다
 IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
@@ -36,12 +37,13 @@ def get_assignments(date: str) -> dict:
 
 
 @mcp.tool()
-def compare_scenario(workers: int, start: str) -> dict:
-    """입국 인원·추가 투입 시기를 바꿨을 때의 유휴·손실 변화를 비교한다.
+def compare_scenario(workers: int, start: str | None = None) -> dict:
+    """입국 인원·시기를 바꿨을 때 유휴·손실 변화를 비교한다.
 
-    workers는 입국 인원(명), start는 투입 시작일(YYYY-MM-DD).
+    workers는 입국 인원(명, 5~50), start는 추가 투입 시작일(YYYY-MM-DD) 또는 생략.
+    수요는 §3 예보 보정값을 재사용한다. 응답 형식: docs/interface.md §5.
     """
-    return {"status": "엔진 준비 중", "workers": workers, "start": start}
+    return compare(workers, start)
 
 
 if __name__ == "__main__":

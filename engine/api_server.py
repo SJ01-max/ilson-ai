@@ -13,6 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from assigner import assign
+from scenario import compare as compare_scenario
 
 IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
 AUTH_MOCK = Path(__file__).resolve().parent / "auth_mock.json"
@@ -86,3 +87,15 @@ def get_forecast(_: Annotated[str, Depends(require_auth)]):
 @app.get("/assignments")
 def get_assignments(date: str, _: Annotated[str, Depends(require_auth)]):
     return assign(date)
+
+
+@app.get("/scenario")
+def get_scenario(
+    workers: int,
+    _: Annotated[str, Depends(require_auth)],
+    start: str | None = None,
+):
+    try:
+        return compare_scenario(workers, start)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
