@@ -18,8 +18,8 @@ mcp = MCPServer("ilson-ai")
 def get_idle_forecast() -> dict:
     """이번 주 유휴 인력 예보를 조회한다.
 
-    날짜별 날씨·필요 인력(demand)·보유 인력(supply)·유휴 인원(idle)·예상 손실액(loss_krw)과
-    주간 합계가 필요할 때 사용한다. 응답 형식: docs/interface.md §3.
+    날짜별 날씨·필요 인력(demand)·보유 인력(supply)·유휴 인원(idle)·유휴 인건비 환산액(loss_krw,
+    idle × 일당 10만 원)과 주간 합계가 필요할 때 사용한다. 응답 형식: docs/interface.md §3.
     """
     if not IDLE_FORECAST.exists():
         return {"error": "forecast 미생성 — python3 forecast/idle.py 먼저 실행"}
@@ -38,10 +38,11 @@ def get_assignments(date: str) -> dict:
 
 @mcp.tool()
 def compare_scenario(workers: int, start: str | None = None) -> dict:
-    """입국 인원·시기를 바꿨을 때 유휴·손실 변화를 비교한다.
+    """입국 인원·시기를 바꿨을 때 유휴·부족·유휴 인건비 환산액 변화를 비교한다.
 
     workers는 입국 인원(명, 5~50), start는 추가 투입 시작일(YYYY-MM-DD) 또는 생략.
-    수요는 §3 예보 보정값을 재사용한다. 응답 형식: docs/interface.md §5.
+    수요는 §3 예보 보정값을 재사용한다. unmet>0이면 수요 미충족(utilization과 함께 확인).
+    응답 형식: docs/interface.md §5.
     """
     return compare(workers, start)
 

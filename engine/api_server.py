@@ -1,4 +1,7 @@
-"""FastAPI 서버 — 계산은 engine 모듈 호출만, 응답 형식은 docs/interface.md §2·§3."""
+"""FastAPI 서버 — 계산은 engine 모듈 호출만, 응답 형식은 docs/interface.md §2·§3·§5.
+
+/forecast·/scenario의 loss_krw는 유휴 인건비 환산액(유휴 인일 × 일당 10만 원)이다.
+"""
 
 import base64
 import hashlib

@@ -1,7 +1,8 @@
-"""시나리오 비교 — 입국 인원·시기 변경 시 주간 유휴·손실 변화.
+"""시나리오 비교 — 입국 인원·시기 변경 시 주간 유휴·부족·유휴 인건비 환산액.
 
 응답 형식: docs/interface.md §5.
 수요는 forecast(§3)의 보정값을 그대로 재사용 — 이중 계산 금지.
+loss_krw는 유휴 인일 × 일당(10만 원) 환산액(실제 손익 전체가 아님).
 """
 
 import json
@@ -23,19 +24,26 @@ def _load_forecast() -> dict:
 
 
 def _week_totals(days: list[dict], workers_by_date: dict[str, int]) -> dict:
-    """일별 공급을 받아 주간 idle·loss·utilization 집계."""
+    """일별 공급을 받아 주간 idle·unmet·loss·utilization 집계.
+
+    unmet = max(demand - supply, 0) 주간 합계 (수요 미충족 인일).
+    utilization이 높아도 unmet>0이면 수요 미충족 상태 — 함께 확인해야 한다.
+    """
     idle_total = 0
+    unmet_total = 0
     supply_total = 0
     used_total = 0  # 투입인일 = min(supply, demand)
     for d in days:
         supply = workers_by_date[d["date"]]
         demand = d["demand"]
         idle_total += max(supply - demand, 0)
+        unmet_total += max(demand - supply, 0)
         supply_total += supply
         used_total += min(supply, demand)
     utilization = round(used_total / supply_total, 2) if supply_total else 0.0
     return {
         "idle": idle_total,
+        "unmet": unmet_total,
         "loss_krw": idle_total * WAGE_KRW,
         "utilization": utilization,
     }
@@ -91,6 +99,7 @@ def compare(workers: int, start: str | None) -> dict:
         },
         "diff": {
             "idle": scenario_totals["idle"] - base_totals["idle"],
+            "unmet": scenario_totals["unmet"] - base_totals["unmet"],
             "loss_krw": scenario_totals["loss_krw"] - base_totals["loss_krw"],
         },
     }

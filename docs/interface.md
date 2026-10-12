@@ -106,14 +106,14 @@ F03,농가 C,백석읍,사과,12,60대,1
 
 ## 5. 시나리오 비교 응답 JSON (성재 → 정환)
 
-입국 인원·추가 투입 시기를 바꿨을 때의 주간 유휴·손실 변화를 비교.
+입국 인원·추가 투입 시기를 바꿨을 때의 주간 유휴·부족·유휴 인건비 환산액 변화를 비교.
 수요는 §3 예보의 보정값(`data/idle_forecast.json`의 `days[].demand`)을 그대로 재사용 — 이중 계산 금지.
 
 ```json
 {
-  "base":     { "workers": 20, "start": null,         "idle": 42, "loss_krw": 4200000, "utilization": 0.70 },
-  "scenario": { "workers": 30, "start": "2027-04-01", "idle": 42, "loss_krw": 4200000, "utilization": 0.70 },
-  "diff":     { "idle": 0, "loss_krw": 0 }
+  "base":     { "workers": 20, "start": null,         "idle": 42, "unmet": 0, "loss_krw": 4200000, "utilization": 0.70 },
+  "scenario": { "workers": 30, "start": "2027-04-01", "idle": 42, "unmet": 0, "loss_krw": 4200000, "utilization": 0.70 },
+  "diff":     { "idle": 0, "unmet": 0, "loss_krw": 0 }
 }
 ```
 
@@ -122,9 +122,11 @@ F03,농가 C,백석읍,사과,12,60대,1
   - `start`가 `null` 또는 주 시작(§3 `week_start`) 이전 → 주 전체 `supply = workers`.
   - `start`가 주 중간 → 그 날짜부터 `workers`, 이전 날짜는 `base`의 20명.
   - `start`가 주 끝(마지막 날짜) 이후 → 주 전체 영향 없음 (scenario = base).
+- `idle` = 주간 `max(supply − demand, 0)` 합계 (유휴 인일).
+- `unmet` = 주간 `max(demand − supply, 0)` 합계 (수요 미충족 인일). **`utilization`이 높아도 `unmet>0`이면 수요 미충족 상태** — 두 지표를 함께 봐야 한다.
 - `utilization` = `투입인일 ÷ 공급인일` (주간 합계, 소수 둘째 자리). `투입인일 = min(supply, demand)`, `공급인일 = supply`.
-- `diff = scenario − base` (음수면 개선).
-- 일당 10만 원 고정, `loss_krw = idle × 100000`.
+- `loss_krw` = `idle × 100000` — **유휴 인건비 환산액**(일당 10만 원 가정). 실제 손익 전체가 아니라, 노는 인력에 지급되는 인건비 추정치.
+- `diff = scenario − base` (`idle`·`unmet`·`loss_krw` 모두 음수면 개선 방향).
 
 ---
 
