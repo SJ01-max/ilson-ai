@@ -4,6 +4,7 @@ import ForecastPage from './pages/ForecastPage.jsx';
 import AssignmentBoardPage from './pages/AssignmentBoardPage.jsx';
 import ScenarioPage from './pages/ScenarioPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import ChatWidget from './components/chat/ChatWidget.jsx';
 import { logout } from './api/auth.js';
 import { getDisplayName, getToken, UNAUTHORIZED_EVENT } from './api/client.js';
 
@@ -100,6 +101,8 @@ export default function App() {
       {tab === 'forecast' && <ForecastPage />}
       {tab === 'board' && <AssignmentBoardPage />}
       {tab === 'scenario' && <ScenarioPage />}
+
+      <ChatWidget />
     </div>
   );
 }
