@@ -67,7 +67,7 @@
 
 ### 검증 자동화
 
-- 매 변경 후 **npm run build + headless Chrome DOM 측정 + MCP stdio 핸드셰이크 + curl 전구간**을 이번 세션 다섯 번의 "전체 점검"에서 반복 통과.
+- 매 변경 후 **npm run build + headless Chrome DOM 측정 + MCP stdio 핸드셰이크 + curl 전구간**을 개발 기간 중 5회의 전 구간 점검(빌드·headless·MCP·API) 반복 통과.
 - GitHub Actions 적재는 수동 트리거(`gh workflow run`)로 실제 KMA 호출 → bot 커밋(`b3f8b08`)까지 1회 end-to-end 통과.
 
 ## 5. 의도적 범위 제외와 로드맵
@@ -132,7 +132,7 @@ cd dashboard && npm install && cd ..
 
 - 데모 데이터 재생성: `python3 forecast/idle.py --demo` → `data/idle_forecast_demo.json` (54인일)
 - 실데이터 재생성: `python3 forecast/kma_api.py && python3 forecast/idle.py` → `data/idle_forecast.json` (42인일)
-- 로그인: `baekseok_admin` / 비밀번호는 팀 내부 공유 (`.env` 별도)
+- 로그인: `baekseok_admin` / 비밀번호는 팀 내부 공유(저장소에는 해시만 존재)
 
 ---
 
