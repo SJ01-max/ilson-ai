@@ -64,14 +64,20 @@ def assign(date, fair=False, workers_df=None):
             )
 
     # ③ 점수 합 최대화 + 결정성 보장용 타이브레이커
-    # CP-SAT 는 정수 목적함수만 받으므로 점수를 SCALE 배 하고, 동점일 때
-    # worker_id 사전순이 빠른 쪽을 미세하게 선호 (가중 1 vs 점수 1=SCALE → 10^-4 영향).
+    # 동점 해가 "어느 농가가 부족한가"만 다를 때(근로자 전원 배정) worker_id 만으로는 안
+    # 가려져 OS·CPU 에 따라 부족 농가가 달라진다 (환경 간 결정성 — 멘토 QA-05 보강).
+    # worker_id 사전순(1차) + 요청 순서(2차)로 완전 정렬. 가중 최대 N*R ≈ 80 ≪ SCALE 라
+    # 점수 1점 차이가 뒤집히지 않는다 (10^-4 영향).
     SCALE = 10_000
     wid_rank = {wid: idx for idx, wid in enumerate(sorted(workers["worker_id"]))}
+    rid_rank = {rid: idx for idx, rid in enumerate(sorted(day_reqs["req_id"]))}
     N = len(wid_rank)
+    R = len(rid_rank)
     model.maximize(
         sum(
-            (int(scores[key]["score"]) * SCALE + (N - wid_rank[key[0]])) * var
+            (int(scores[key]["score"]) * SCALE
+             + (N - wid_rank[key[0]]) * R
+             + (R - rid_rank[key[1]])) * var
             for key, var in x.items()
         )
     )
