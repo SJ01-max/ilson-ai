@@ -1,5 +1,5 @@
 """
-내일부터 7일간 유휴 인력·손실 예보 → docs/interface.md 3번 JSON
+내일부터 7일간 유휴 인력·유휴 인건비 환산액 예보 → docs/interface.md 3번 JSON
 
 - 입력: data/weekly_rain.csv (kma_api.py 결과), forecast/demand.py 의 필요 인원
     · --demo 이면 날씨만 data/demo_rain.csv (day 1~7 → rain_day) 고정값 사용 — 시연 날 비가 안 올 때 대비
@@ -28,7 +28,7 @@ KST = ZoneInfo("Asia/Seoul")
 
 # ---- 설정 ----
 SUPPLY = 20                 # 보유 근로자 수 (명)
-DAILY_WAGE = 100_000        # 1인 일당 (원) — 유휴 1명당 손실
+DAILY_WAGE = 100_000        # 1인 일당 (원) — 유휴 1명당 인건비 환산액
 
 
 def tomorrow():
@@ -70,7 +70,7 @@ def main():
     out_path = OUT_DEMO if demo else OUT
     out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(pd.DataFrame(days).to_string(index=False))
-    print(f"\n주간 합계: 유휴 {result['week_total']['idle']}명·일, 손실 {result['week_total']['loss_krw']:,}원")
+    print(f"\n주간 합계: 유휴 {result['week_total']['idle']}명·일, 유휴 인건비 환산액 {result['week_total']['loss_krw']:,}원")
     print(f"→ {out_path} 저장")
     if demo:
         print("\n" + "=" * 60)
