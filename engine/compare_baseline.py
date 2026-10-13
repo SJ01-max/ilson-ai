@@ -20,8 +20,25 @@ sys.path.insert(0, str(ENGINE))
 from assigner import assign  # noqa: E402
 from scorer import load_data, score  # noqa: E402
 
-DATES = ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"]
+# 기준선 비교는 10/13~16 네 날짜로 고정 — 이후 추가되는 10/17+ 요청에 영향받지 않게.
+# 다른 범위로 돌리고 싶으면 python3 engine/compare_baseline.py 2026-10-17 2026-10-23
+DEFAULT_DATES = ["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"]
 OUTPUT = ENGINE.parent / "docs" / "baseline-comparison.md"
+
+
+def _parse_date_args(argv: list[str]) -> list[str]:
+    """CLI 인자: 시작일 종료일 (YYYY-MM-DD) 두 개. 생략 시 DEFAULT_DATES."""
+    if len(argv) < 2:
+        return DEFAULT_DATES
+    from datetime import date, timedelta
+    d0 = date.fromisoformat(argv[0])
+    d1 = date.fromisoformat(argv[1])
+    out = []
+    cur = d0
+    while cur <= d1:
+        out.append(cur.isoformat())
+        cur += timedelta(days=1)
+    return out
 
 
 def _naive_assign(date: str, workers, farms, requests) -> list[dict]:
@@ -131,7 +148,8 @@ def _opt_assigned_with_crop(date: str, farms, workers, requests) -> list[dict]:
     return out
 
 
-def run() -> str:
+def run(dates: list[str] | None = None) -> str:
+    dates = dates or DEFAULT_DATES
     workers, farms, requests = load_data()
     rows: list[dict] = []
     totals_a: dict = defaultdict(int)
@@ -140,7 +158,7 @@ def run() -> str:
     scores_b: list[int] = []
     crop_a = crop_b = town_a = town_b = 0
 
-    for date in DATES:
+    for date in dates:
         day_reqs = requests[requests["date"] == date]
         requested = int(day_reqs["headcount"].sum())
 
@@ -253,4 +271,4 @@ def _render_md(rows, total) -> str:
 
 
 if __name__ == "__main__":
-    print(run())
+    print(run(_parse_date_args(sys.argv[1:])))
