@@ -100,14 +100,15 @@ export default function App() {
         <Tabs tabs={TABS} value={tab} onChange={setTab} />
         <section className="page-heading"><div><p className="section-kicker">{TABS.find((item) => item.id === tab).kicker}</p><h2>{TABS.find((item) => item.id === tab).title}</h2></div><p className="page-heading-note">백석농협 · 공공형 계절근로</p></section>
 
+        <ChatWidget />
+
         {tab === 'forecast' && <ForecastPage />}
         {tab === 'board' && <AssignmentBoardPage />}
         {tab === 'scenario' && <ScenarioPage />}
         <footer className="app-footer"><span>일손배정 AI</span><span>양주시 공공형 계절근로 운영</span></footer>
       </div>
 
-      {/* 탭 콘텐츠 바깥(.app 바깥) 최상위에 배치 — position:fixed 가 어떤 조상 스타일에도 영향받지 않게 */}
-      <ChatWidget />
+
     </>
   );
 }

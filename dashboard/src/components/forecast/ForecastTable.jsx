@@ -1,6 +1,6 @@
-import { toMan } from '../../utils/forecast.js';
+import { shortDate, toMan } from '../../utils/forecast.js';
 
-export default function ForecastTable({ rows, total }) {
+export default function ForecastTable({ rows, total, selectedDate, onSelect }) {
   return (
     <div className="table-wrap">
       <table>
@@ -10,15 +10,15 @@ export default function ForecastTable({ rows, total }) {
             <th className="left">날씨</th>
             <th>수요(명)</th>
             <th>공급(명)</th>
-            <th>유휴(인일)</th>
+            <th>유휴(명)</th>
             <th>환산액(만 원)</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.date} className={r.rainy ? 'rainy' : undefined}>
+            <tr key={r.date} className={[r.rainy && 'rainy', r.date === selectedDate && 'selected-row'].filter(Boolean).join(' ')}>
               <td>
-                {r.date} ({r.weekday})
+                <button type="button" className="date-row-button" aria-pressed={r.date === selectedDate} onClick={() => onSelect?.(r.date)}>{shortDate(r.date)} <span>{r.weekday}</span></button>
               </td>
               <td className="left">
                 <span className={r.rainy ? 'weather-chip weather-chip--rain' : 'weather-chip'}>
