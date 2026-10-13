@@ -16,3 +16,8 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Claude Code 세션 로컬 산출물
+.agents/
+.claude/
+skills-lock.json

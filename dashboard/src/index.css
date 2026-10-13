@@ -231,8 +231,9 @@ td.num-unmet { color: var(--status-unmet); font-weight: 500; }
 .login-footer { display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap; padding-top: 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
 /* 상단 질문창: 제목 아래에서 접근하고 대화만 접을 수 있다. */
 .chat-inline { background: var(--subtle); border: 1px solid var(--border); padding: 17px 19px; margin-bottom: 26px; }
-.chat-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 11px; }
+.chat-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 6px; }
 .chat-head h2 { font-size: 15px; font-weight: 650; letter-spacing: -.3px; }
+.chat-note { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 11px; }
 .chat-toggle { appearance: none; border: 0; background: none; color: var(--text-muted); font-size: 12px; padding: 3px 0; text-decoration: underline; text-underline-offset: 4px; }
 .chat-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; }
 .chat-form input { width: 100%; min-width: 0; font-size: 15px; padding: 10px 12px; min-height: 45px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text-1); }

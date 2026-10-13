@@ -47,6 +47,7 @@ export default function ChatWidget() {
         <h2 id="chat-inline-title">일손 도우미</h2>
         {messages.length > 0 && <button type="button" className="chat-toggle" aria-expanded={open} aria-controls="chat-conversation" onClick={() => setOpen((value) => !value)}>{open ? '대화 접기' : '이전 대화 보기'}</button>}
       </header>
+      <p className="chat-note">Claude가 답변하며, 숫자는 일손배정 엔진에서 조회합니다</p>
       <form className="chat-form" onSubmit={(event) => { event.preventDefault(); send(input); }}>
         <input type="text" value={input} onChange={(event) => setInput(event.target.value)} placeholder="예보나 배정에 대해 물어보세요." aria-label="일손 도우미 질문" autoComplete="off" disabled={busy} />
         <button type="submit" disabled={busy || !input.trim()}>{busy ? '답변 중…' : '질문 보내기'}</button>
