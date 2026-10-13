@@ -128,6 +128,15 @@ def main():
     df.to_csv(OUT, index=False, encoding="utf-8-sig")
     print(df.to_string(index=False))
     print(f"\n→ {OUT} 저장. 비 오는 날(≥{RAIN_THRESHOLD}%): {int(df.rain_day.sum())}일")
+    # 원자료 스냅샷 적재 — 보너스지 의존성 아님. 실패해도 kma_api 자체는 안 터지게.
+    try:
+        hist_dir = ROOT / "data" / "weather_history"
+        hist_dir.mkdir(parents=True, exist_ok=True)
+        snapshot = hist_dir / f"{datetime.now(KST).date().isoformat()}.csv"
+        df.to_csv(snapshot, index=False, encoding="utf-8-sig")
+        print(f"→ {snapshot} 적재 (예보-실황 대조용)")
+    except Exception as e:
+        print(f"⚠ 원자료 적재 건너뜀: {e}")
 
 
 if __name__ == "__main__":

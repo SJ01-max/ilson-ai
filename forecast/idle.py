@@ -59,9 +59,12 @@ def main():
         idle = max(0, SUPPLY - demand)
         days.append(dict(date=d, weather="비" if is_rain else "맑음", demand=demand,
                          supply=SUPPLY, idle=idle, loss_krw=idle * DAILY_WAGE))
+    # 메타: 프론트가 "예보 생성: M/D HH시" 라벨과 "시연 데이터" 뱃지를 띄우는 근거.
     result = dict(week_start=week_start.isoformat(), days=days,
                   week_total=dict(idle=sum(x["idle"] for x in days),
-                                  loss_krw=sum(x["loss_krw"] for x in days)))
+                                  loss_krw=sum(x["loss_krw"] for x in days)),
+                  generated_at=datetime.now(KST).isoformat(timespec="seconds"),
+                  source="demo" if demo else "kma")
     OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(pd.DataFrame(days).to_string(index=False))
     print(f"\n주간 합계: 유휴 {result['week_total']['idle']}명·일, 손실 {result['week_total']['loss_krw']:,}원")
