@@ -25,7 +25,8 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]      # 레포 루트 (ilson-ai/)
 load_dotenv(ROOT / ".env")                      # 루트의 .env 읽기
-KEY = os.environ.get("KMA_API_KEY")
+# GitHub Actions Secrets·수동 입력에서 끝줄 개행/공백이 섞여 들어와도 KMA가 403으로 리젝하지 않게 strip.
+KEY = (os.environ.get("KMA_API_KEY") or "").strip()
 if not KEY or "여기에" in KEY:
     sys.exit("루트 .env 파일의 KMA_API_KEY 에 공공데이터포털 인증키(Decoding)를 넣어주세요.")
 OUT = ROOT / "data" / "weekly_rain.csv"
