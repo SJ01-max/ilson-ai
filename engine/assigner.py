@@ -32,10 +32,23 @@ def assign(date):
             sum(x[wid, req["req_id"]] for wid in workers["worker_id"]) <= int(req["headcount"])
         )
 
-    # ③ 점수 합 최대화
-    model.maximize(sum(int(scores[key]["score"]) * var for key, var in x.items()))
+    # ③ 점수 합 최대화 + 결정성 보장용 타이브레이커
+    # CP-SAT 는 정수 목적함수만 받으므로 점수를 SCALE 배 하고, 동점일 때
+    # worker_id 사전순이 빠른 쪽을 미세하게 선호 (가중 1 vs 점수 1=SCALE → 10^-4 영향).
+    SCALE = 10_000
+    wid_rank = {wid: idx for idx, wid in enumerate(sorted(workers["worker_id"]))}
+    N = len(wid_rank)
+    model.maximize(
+        sum(
+            (int(scores[key]["score"]) * SCALE + (N - wid_rank[key[0]])) * var
+            for key, var in x.items()
+        )
+    )
 
     solver = cp_model.CpSolver()
+    # 결정성 — 같은 입력엔 항상 같은 배정 (멘토 QA P0-5)
+    solver.parameters.random_seed = 1
+    solver.parameters.num_search_workers = 1
     status = solver.solve(model)
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         raise RuntimeError(f"배정 실패: solver status={solver.status_name(status)}")
