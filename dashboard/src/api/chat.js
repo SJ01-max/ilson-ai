@@ -7,8 +7,8 @@ import { apiFetch } from './client.js';
 
 /**
  * @param {Array<{ role: 'user'|'assistant', content: string }>} messages
- * @param {{ mode?: 'demo'|null }} [opts]
+ * @param {{ mode?: 'demo'|null, signal?: AbortSignal }} [opts]
  */
-export function postChat(messages, { mode } = {}) {
-  return apiFetch('/chat', { method: 'POST', body: { messages, mode: mode ?? null } });
+export function postChat(messages, { mode, signal } = {}) {
+  return apiFetch('/chat', { method: 'POST', body: { messages, mode: mode ?? null }, signal });
 }

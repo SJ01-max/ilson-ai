@@ -76,7 +76,7 @@ export function clearSession() {
  * @param {string} path '/forecast' 처럼 슬래시로 시작
  * @param {{ method?: string, body?: object, auth?: boolean }} [opts]
  */
-export async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
+export async function apiFetch(path, { method = 'GET', body, auth = true, signal } = {}) {
   const headers = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   const token = auth ? getToken() : null;
@@ -94,8 +94,10 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
     });
-  } catch {
+  } catch (err) {
+    if (err?.name === 'AbortError') throw new ApiError(0, '요청이 시간 초과로 취소되었습니다.');
     throw new ApiError(0, `API 서버(${API_BASE})에 연결할 수 없습니다. ./run.sh 실행 여부를 확인하세요.`);
   }
 

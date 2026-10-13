@@ -35,6 +35,14 @@ export default function App() {
     return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
   }, []);
 
+  // 연동 안내 팝업: Esc 로 닫기
+  useEffect(() => {
+    if (!mcpOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setMcpOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mcpOpen]);
+
   async function handleLogout() {
     try {
       await logout();
@@ -79,8 +87,7 @@ export default function App() {
               </button>
               {mcpOpen && (
                 <div className="mcp-tip" role="status">
-                  이 시스템은 Claude와 MCP로 연결됩니다. Claude에서
-                  &ldquo;다음 주 유휴 어때?&rdquo;라고 물어보세요.
+                  Claude Desktop에 MCP 서버를 등록하면 대화로 조회할 수 있습니다(설정은 README).
                 </div>
               )}
             </div>

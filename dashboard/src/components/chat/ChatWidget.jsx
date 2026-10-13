@@ -3,6 +3,7 @@ import { postChat } from '../../api/chat.js';
 import { ApiError, MODE_CHANGE_EVENT, getMode } from '../../api/client.js';
 
 const SUGGESTIONS = ['이번 주 유휴 이유는?', '내일 배정 알려줘', '15명으로 줄이면?'];
+const CHAT_TIMEOUT_MS = 30_000;
 
 // 탭 콘텐츠와 별도로 유지하여 화면을 바꿔도 대화가 이어진다.
 export default function ChatWidget() {
@@ -11,6 +12,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [lastQuestion, setLastQuestion] = useState(null);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -24,6 +26,7 @@ export default function ChatWidget() {
     const handler = () => {
       setMessages([]);
       setError(null);
+      setLastQuestion(null);
     };
     window.addEventListener(MODE_CHANGE_EVENT, handler);
     return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
@@ -38,16 +41,33 @@ export default function ChatWidget() {
     setOpen(true);
     setBusy(true);
     setError(null);
+    setLastQuestion(text);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
     try {
-      const data = await postChat(next, { mode: getMode() });
+      const data = await postChat(next, { mode: getMode(), signal: controller.signal });
       setMessages([...next, { role: 'assistant', content: data.reply || '(응답 없음)' }]);
     } catch (err) {
-      const msg = err instanceof ApiError && err.status === 503
-        ? 'AI 질의 기능이 설정되지 않았습니다'
-        : `오류: ${err.message ?? String(err)}`;
+      let msg;
+      if (err instanceof ApiError && err.status === 503) {
+        msg = 'AI 질의 기능이 설정되지 않았습니다';
+      } else if (err instanceof ApiError && err.status === 0) {
+        msg = err.message;
+      } else {
+        msg = 'AI 응답 생성에 실패했습니다. 잠시 후 다시 시도해주세요';
+      }
       setError(msg);
     } finally {
+      clearTimeout(timer);
       setBusy(false);
+    }
+  }
+
+  function retry() {
+    if (lastQuestion) {
+      // 마지막 사용자 질문 재사용 — 큐를 그대로 유지(중복 추가 방지하려 pop)
+      setMessages((prev) => prev.slice(0, -1));
+      send(lastQuestion);
     }
   }
 
@@ -69,7 +89,14 @@ export default function ChatWidget() {
         <div className="chat-log" ref={scrollRef} role="log" aria-label="일손 도우미 대화" aria-live="polite" aria-relevant="additions text">
           {messages.map((message, index) => <div key={index} className={`chat-turn chat-turn--${message.role}`}><span className="chat-speaker">{message.role === 'user' ? '담당자' : '일손 도우미'}</span><p className="chat-message">{message.content}</p></div>)}
           {busy && <div className="chat-turn chat-turn--assistant"><span className="chat-speaker">일손 도우미</span><p className="chat-message chat-loading" role="status">예보와 배정 데이터를 확인하고 있습니다…</p></div>}
-          {error && <p className="chat-error" role="alert">{error}</p>}
+          {error && (
+            <div className="chat-error-row" role="alert">
+              <p className="chat-error">{error}</p>
+              {lastQuestion && !busy && (
+                <button type="button" className="chat-retry" onClick={retry}>다시 시도</button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
