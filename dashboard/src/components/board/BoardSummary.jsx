@@ -65,7 +65,7 @@ export default function BoardSummary({ date, summary }) {
             </>
           )}
         </p>
-        <div className="meta">점수는 작목 경험·경력·한국어·재입국·운전·거주 읍면 가중치의 합계입니다 (engine/scorer.py).</div>
+        <div className="meta">점수는 작목 경험·경력·한국어·재입국·운전·거주 읍면 가중치의 합계입니다.</div>
       </div>
     </>
   );

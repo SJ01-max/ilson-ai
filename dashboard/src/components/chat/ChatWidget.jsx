@@ -57,15 +57,15 @@ export default function ChatWidget() {
           aria-label="AI 질의 채팅 열기"
           onClick={() => setOpen(true)}
         >
-          💬
+          일손 도우미
         </button>
       )}
       {open && (
         <section className="chat-panel" role="dialog" aria-label="AI 질의 채팅">
           <header className="chat-head">
             <div className="chat-title">
-              <b>Claude</b>
-              <span>· 데이터는 일손배정 엔진에서 조회합니다</span>
+              <b>일손 도우미</b>
+              <span>· 예보와 배정에 대해 질문하세요</span>
             </div>
             <button type="button" className="chat-close" aria-label="닫기" onClick={() => setOpen(false)}>
               ✕

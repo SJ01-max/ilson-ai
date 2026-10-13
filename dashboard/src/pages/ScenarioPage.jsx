@@ -102,8 +102,8 @@ export default function ScenarioPage() {
   const sign = (n) => (n > 0 ? `+${n}` : `${n}`);
 
   return (
-    <div className="stack">
-      <section className="card" aria-label="시나리오 조건">
+    <div className="stack scenario-layout">
+      <section className="card scenario-controls" aria-label="시나리오 조건">
         <h2>조건 설정</h2>
         <div className="sliders">
           <label className="slider">
@@ -151,8 +151,8 @@ export default function ScenarioPage() {
         </div>
       </section>
 
-      <section className={loading ? 'card hero is-loading' : 'card hero'} aria-busy={loading}>
-        <h2>결과 요약 · 현재 vs 시나리오</h2>
+      <section className={loading ? 'card hero scenario-results is-loading' : 'card hero scenario-results'} aria-busy={loading}>
+        <h2>결과 요약 · 현재 계획과 변경안</h2>
         <div className="summary summary--4">
           <section className="stat">
             <div className="label">주간 유휴 인일</div>
@@ -189,12 +189,12 @@ export default function ScenarioPage() {
               <small>%</small>
             </div>
             <div className="hint">
-              현재 {Math.round(base.utilization * 100)}% · unmet &gt; 0이면 수요 미충족
+              현재 {Math.round(base.utilization * 100)}% · 수요 미충족도 함께 확인하세요
             </div>
           </section>
         </div>
         <div className="headline">
-          <div className="eyebrow">시나리오 문장</div>
+          <div className="eyebrow">변경안 요약</div>
           <p className="text">
             <span>
               {workers}명이 {shortDate(start)}({weekdayOf(start)})부터 투입되면

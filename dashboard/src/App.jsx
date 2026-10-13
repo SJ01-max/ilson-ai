@@ -9,9 +9,9 @@ import { logout } from './api/auth.js';
 import { getDisplayName, getToken, UNAUTHORIZED_EVENT } from './api/client.js';
 
 const TABS = [
-  { id: 'forecast', label: '유휴 예보' },
-  { id: 'board', label: '배정 보드' },
-  { id: 'scenario', label: '시나리오 비교' },
+  { id: 'forecast', label: '유휴 예보', title: '이번 주 인력 현황', kicker: '주간 운영' },
+  { id: 'board', label: '배정 보드', title: '농가별 배정 현황', kicker: '일별 배정' },
+  { id: 'scenario', label: '시나리오 비교', title: '인력 투입 계획 비교', kicker: '운영 계획' },
 ];
 
 export default function App() {
@@ -56,12 +56,12 @@ export default function App() {
       <div className="app">
         <header className="app-header">
           <div className="brand">
-            <h1>일손배정 AI</h1>
-            <span className="sub">양주시 공공형 계절근로 유휴 예보·배정 플랫폼</span>
+            <h1>일손배정<span className="brand-ai">AI</span></h1>
+            <span className="sub">양주시 공공형<br />계절근로 운영</span>
           </div>
           <div className="header-side">
             <span className="header-meta">
-              {today} · 데이터 기준: 기상청 단기예보
+              {today}
             </span>
             <div className="mcp">
               <button
@@ -71,7 +71,7 @@ export default function App() {
                 aria-label="MCP 연동 안내"
                 onClick={() => setMcpOpen((v) => !v)}
               >
-                i
+                연동 안내
               </button>
               {mcpOpen && (
                 <div className="mcp-tip" role="status">
@@ -98,10 +98,12 @@ export default function App() {
         </header>
 
         <Tabs tabs={TABS} value={tab} onChange={setTab} />
+        <section className="page-heading"><div><p className="section-kicker">{TABS.find((item) => item.id === tab).kicker}</p><h2>{TABS.find((item) => item.id === tab).title}</h2></div><p className="page-heading-note">백석농협 · 공공형 계절근로</p></section>
 
         {tab === 'forecast' && <ForecastPage />}
         {tab === 'board' && <AssignmentBoardPage />}
         {tab === 'scenario' && <ScenarioPage />}
+        <footer className="app-footer"><span>일손배정 AI</span><span>양주시 공공형 계절근로 운영</span></footer>
       </div>
 
       {/* 탭 콘텐츠 바깥(.app 바깥) 최상위에 배치 — position:fixed 가 어떤 조상 스타일에도 영향받지 않게 */}
