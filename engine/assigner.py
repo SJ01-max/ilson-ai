@@ -1,23 +1,46 @@
-"""CP-SAT 날짜별 배정 최적화 — docs/interface.md 2번 JSON 출력."""
+"""CP-SAT 날짜별 배정 최적화 — docs/interface.md 2번 JSON 출력.
+
+fair=True 옵션: 요청한 농가에 최소 1명 보장(멘토 QA-10). 가용 인원이 요청 농가 수보다
+적어 불가능한 날은 제약을 적용하지 않고 응답의 fairness_applied=False 로 사실을 남긴다.
+기본값(fair=False)에서는 기존 동작과 완전히 동일하다.
+"""
 
 import json
 
 from ortools.sat.python import cp_model
-from scorer import load_data, score_table
+from scorer import load_data, score_table, load_data as _reload  # noqa: F401
 
 
-def assign(date):
-    workers, farms, requests = load_data()
+def assign(date, fair=False, workers_df=None):
+    workers_src, farms, requests = load_data()
+    workers = workers_src if workers_df is None else workers_df
     day_reqs = requests[requests["date"] == date].reset_index(drop=True)
     if day_reqs.empty:
-        return {
+        resp = {
             "date": date,
             "assignments": [],
             "unassigned_workers": sorted(workers["worker_id"]),
             "unmet_requests": [],
         }
+        if fair:
+            resp["fairness_applied"] = False
+            resp["fairness_note"] = "요청 없음"
+        return resp
     table = score_table(workers, farms, day_reqs)
     scores = {(r["worker_id"], r["req_id"]): r for _, r in table.iterrows()}
+
+    # 요청 농가 수 vs 가용 인원 — fair 제약 적용 가능 여부 사전 판정
+    farms_requesting = sorted(set(day_reqs["farm_id"]))
+    fairness_applied = False
+    fairness_note = ""
+    if fair:
+        if len(workers) >= len(farms_requesting):
+            fairness_applied = True
+        else:
+            fairness_note = (
+                f"가용 인원 {len(workers)}명이 요청 농가 {len(farms_requesting)}곳보다 적어 "
+                "최소 1명 보장을 적용하지 않음"
+            )
 
     model = cp_model.CpModel()
     x = {key: model.new_bool_var(f"x_{key[0]}_{key[1]}") for key in scores}
@@ -31,6 +54,14 @@ def assign(date):
         model.add(
             sum(x[wid, req["req_id"]] for wid in workers["worker_id"]) <= int(req["headcount"])
         )
+
+    # ③ (옵션) 형평성 — 요청 농가는 최소 1명 (가용 인원 ≥ 요청 농가 수일 때만)
+    if fairness_applied:
+        for fid in farms_requesting:
+            farm_reqs = day_reqs[day_reqs["farm_id"] == fid]["req_id"]
+            model.add(
+                sum(x[wid, rid] for wid in workers["worker_id"] for rid in farm_reqs) >= 1
+            )
 
     # ③ 점수 합 최대화 + 결정성 보장용 타이브레이커
     # CP-SAT 는 정수 목적함수만 받으므로 점수를 SCALE 배 하고, 동점일 때
@@ -82,12 +113,18 @@ def assign(date):
         for _, req in day_reqs.iterrows()
         if int(req["headcount"]) > assigned_count[req["req_id"]]
     ]
-    return {
+    resp = {
         "date": date,
         "assignments": assignments,
         "unassigned_workers": sorted(set(workers["worker_id"]) - assigned_workers),
         "unmet_requests": unmet,
     }
+    # fair 옵션을 명시적으로 요청한 경우에만 메타 필드를 노출 — 기본 응답은 바뀌지 않는다.
+    if fair:
+        resp["fairness_applied"] = fairness_applied
+        if fairness_note:
+            resp["fairness_note"] = fairness_note
+    return resp
 
 
 if __name__ == "__main__":

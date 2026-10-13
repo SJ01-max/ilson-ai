@@ -103,8 +103,9 @@ def get_assignments(
     date: str,
     _: Annotated[str, Depends(require_auth)],
     mode: str | None = None,  # 수용만 (배정은 requests.csv 기반이라 mode 무영향 — 일관성 유지용)
+    fair: int = 0,  # 1 이면 요청 농가 최소 1명 보장 (QA-10, 실 데이터에선 효과 0 — docs/fairness-test.md)
 ):
-    return assign(date)
+    return assign(date, fair=bool(fair))
 
 
 @app.get("/scenario")
