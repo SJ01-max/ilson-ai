@@ -21,7 +21,9 @@ from demand import daily_demand
 ROOT = Path(__file__).resolve().parents[1]      # 레포 루트 (ilson-ai/)
 RAIN = ROOT / "data" / "weekly_rain.csv"
 DEMO_RAIN = ROOT / "data" / "demo_rain.csv"
+# 산출물은 모드별로 분리 — 시연 중 실데이터(42인일) 가 덮어 쓰이지 않게.
 OUT = ROOT / "data" / "idle_forecast.json"
+OUT_DEMO = ROOT / "data" / "idle_forecast_demo.json"
 KST = ZoneInfo("Asia/Seoul")
 
 # ---- 설정 ----
@@ -65,10 +67,11 @@ def main():
                                   loss_krw=sum(x["loss_krw"] for x in days)),
                   generated_at=datetime.now(KST).isoformat(timespec="seconds"),
                   source="demo" if demo else "kma")
-    OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    out_path = OUT_DEMO if demo else OUT
+    out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(pd.DataFrame(days).to_string(index=False))
     print(f"\n주간 합계: 유휴 {result['week_total']['idle']}명·일, 손실 {result['week_total']['loss_krw']:,}원")
-    print(f"→ {OUT} 저장")
+    print(f"→ {out_path} 저장")
     if demo:
         print("\n" + "=" * 60)
         print(f"⚠ 데모 데이터: 날씨는 실제 예보가 아닌 {DEMO_RAIN.name} 고정값입니다")

@@ -12,6 +12,21 @@ const NAME_KEY = 'ilson.display_name';
 /** 세션 만료(401) 시 App이 로그인 화면으로 돌리도록 알리는 이벤트 이름 */
 export const UNAUTHORIZED_EVENT = 'ilson:unauthorized';
 
+/** 시연 모드 변경 알림 — 각 페이지가 받아서 재조회 */
+export const MODE_CHANGE_EVENT = 'ilson:mode-change';
+
+// 시연 모드: 'demo' 또는 null. 메모리 전용(새로고침 시 꺼짐).
+let _mode = null;
+
+export function getMode() {
+  return _mode;
+}
+
+export function setMode(mode) {
+  _mode = mode === 'demo' ? 'demo' : null;
+  window.dispatchEvent(new CustomEvent(MODE_CHANGE_EVENT, { detail: { mode: _mode } }));
+}
+
 export class ApiError extends Error {
   constructor(status, message) {
     super(message);
@@ -67,9 +82,15 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
   const token = auth ? getToken() : null;
   if (token) headers.Authorization = `Bearer ${token}`;
 
+  // GET 류에만 mode=demo를 자동 부여. POST(/login, /chat 등)는 영향 없음.
+  let url = `${API_BASE}${path}`;
+  if (method === 'GET' && _mode === 'demo') {
+    url += (path.includes('?') ? '&' : '?') + 'mode=demo';
+  }
+
   let res;
   try {
-    res = await fetch(`${API_BASE}${path}`, {
+    res = await fetch(url, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),

@@ -15,12 +15,13 @@ WORKERS_MIN = 5
 WORKERS_MAX = 50
 
 
-def _load_forecast() -> dict:
-    if not IDLE_FORECAST.exists():
+def _load_forecast(path: Path | None = None) -> dict:
+    path = path or IDLE_FORECAST
+    if not path.exists():
         raise FileNotFoundError(
             "forecast 미생성 — python3 forecast/idle.py 먼저 실행",
         )
-    return json.loads(IDLE_FORECAST.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _week_totals(days: list[dict], workers_by_date: dict[str, int]) -> dict:
@@ -64,11 +65,12 @@ def _supply_per_day(days: list[dict], workers: int, start: str | None) -> dict[s
     return {date: (workers if date >= start else BASE_WORKERS) for date in dates}
 
 
-def compare(workers: int, start: str | None) -> dict:
+def compare(workers: int, start: str | None, forecast_path: Path | None = None) -> dict:
     """입국 인원·시기 변경 시나리오를 base(20명)와 비교.
 
     workers: 시나리오 공급 인원 (5~50).
     start: 추가 투입 시작일 YYYY-MM-DD 또는 None. None이면 주 전체 workers 적용.
+    forecast_path: 수요 소스 JSON (대시보드의 시연 모드가 demo JSON을 넘김). None이면 실데이터.
 
     반환: docs/interface.md §5 형식.
     """
@@ -77,7 +79,7 @@ def compare(workers: int, start: str | None) -> dict:
             f"workers는 {WORKERS_MIN}~{WORKERS_MAX} 범위여야 합니다 (받은 값: {workers})",
         )
 
-    forecast = _load_forecast()
+    forecast = _load_forecast(forecast_path)
     days = forecast["days"]
 
     base_supply = {d["date"]: BASE_WORKERS for d in days}

@@ -68,6 +68,12 @@ h1, h2, h3, p { margin: 0; }
 .header-meta { font-size: 12px; color: var(--text-muted); }
 .forecast-basis { font-size: 12px; color: var(--text-muted); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--subtle, var(--surface)); }
 .forecast-basis--demo { color: var(--text-2); background: var(--border-soft, rgba(0,0,0,.05)); border-color: var(--border); font-weight: 600; }
+/* 시연 모드 토글 — 중립(off) ↔ 켜짐 명확(on) */
+.mode-toggle { appearance: none; cursor: pointer; font: inherit; font-size: 12px; padding: 3px 10px 3px 8px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+.mode-toggle:hover { color: var(--text-1); border-color: var(--axis); }
+.mode-toggle-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--axis); }
+.mode-toggle--on { background: var(--text-1); color: var(--page); border-color: var(--text-1); font-weight: 600; }
+.mode-toggle--on .mode-toggle-dot { background: var(--page); box-shadow: 0 0 0 2px rgba(255,255,255,0.25); }
 .text-btn, .icon-btn { appearance: none; border: 0; border-radius: 0; padding: 4px 0; background: none; color: var(--text-2); font-size: 12px; }
 .text-btn:hover, .icon-btn:hover { color: var(--text-1); text-decoration: underline; text-underline-offset: 5px; }
 .user-chip { font-size: 12px; color: var(--text-2); border-left: 1px solid var(--border); padding-left: 12px; }

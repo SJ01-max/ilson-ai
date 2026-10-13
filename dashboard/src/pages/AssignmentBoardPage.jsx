@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getAssignments } from '../api/assignments.js';
 import { groupByFarm, summarize, toIsoDate, upcomingDates } from '../utils/assignments.js';
 import { shortDate, weekdayOf } from '../utils/forecast.js';
+import { MODE_CHANGE_EVENT } from '../api/client.js';
 import BoardSummary from '../components/board/BoardSummary.jsx';
 import FarmCard from '../components/board/FarmCard.jsx';
 
@@ -13,6 +14,7 @@ export default function AssignmentBoardPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -25,7 +27,13 @@ export default function AssignmentBoardPage() {
     return () => {
       alive = false;
     };
-  }, [date]);
+  }, [date, reloadKey]);
+
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener(MODE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
+  }, []);
 
   const quick = upcomingDates(7);
   const farms = result ? groupByFarm(result) : [];

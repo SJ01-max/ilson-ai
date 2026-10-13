@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getForecast } from '../../api/forecast.js';
 import { shortDate } from '../../utils/forecast.js';
+import { MODE_CHANGE_EVENT } from '../../api/client.js';
 
 // data/idle_forecast.json 의 generated_at·source 를 읽어 상단 기준 라벨을 렌더.
 // 메타 없으면 week_start 기반 폴백 — 기존 JSON에도 지장 없게.
@@ -12,6 +13,7 @@ function formatGeneratedAt(iso) {
 
 export default function ForecastBasis() {
   const [forecast, setForecast] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -23,6 +25,12 @@ export default function ForecastBasis() {
     return () => {
       alive = false;
     };
+  }, [reloadKey]);
+
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener(MODE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
   }, []);
 
   if (!forecast) return null;

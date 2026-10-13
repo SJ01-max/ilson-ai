@@ -2,6 +2,9 @@
 
 애드온 분리 원칙: ANTHROPIC_API_KEY 없으면 /chat만 503, 나머지 기능 무영향.
 숫자는 반드시 도구로 조회 — 모델이 지어내지 못하게 system prompt·tool schema로 유도.
+
+주의: 시연용 강수 주간 모드(?mode=demo)는 대시보드 전용이다 — 챗 도구는 항상 실데이터
+    (idle_forecast.json / scenario default) 를 참조하므로, 채팅 답변의 숫자는 UI 토글과 무관하다.
 """
 
 import json

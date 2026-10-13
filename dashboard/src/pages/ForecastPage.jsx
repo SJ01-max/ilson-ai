@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getForecast } from '../api/forecast.js';
 import { buildHeadline, formatManWon, isRainy, shortDate, toRows } from '../utils/forecast.js';
+import { MODE_CHANGE_EVENT } from '../api/client.js';
 import SummaryCards from '../components/forecast/SummaryCards.jsx';
 import DemandSupplyChart from '../components/forecast/DemandSupplyChart.jsx';
 import ForecastTable from '../components/forecast/ForecastTable.jsx';
@@ -10,13 +11,21 @@ export default function ForecastPage() {
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [view, setView] = useState('table');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
+    setForecast(null);
     getForecast()
       .then((data) => alive && setForecast(data))
       .catch((e) => alive && setError(e));
     return () => { alive = false; };
+  }, [reloadKey]);
+
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener(MODE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
   }, []);
 
   if (error) return <div className="card state error">예보를 불러오지 못했습니다: {String(error.message ?? error)}</div>;

@@ -6,6 +6,7 @@ import ScenarioPage from './pages/ScenarioPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import ChatWidget from './components/chat/ChatWidget.jsx';
 import ForecastBasis from './components/forecast/ForecastBasis.jsx';
+import ModeToggle from './components/ModeToggle.jsx';
 import { logout } from './api/auth.js';
 import { getDisplayName, getToken, UNAUTHORIZED_EVENT } from './api/client.js';
 
@@ -65,6 +66,7 @@ export default function App() {
               {today}
             </span>
             <ForecastBasis />
+            <ModeToggle />
             <div className="mcp">
               <button
                 type="button"

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getForecast } from '../api/forecast.js';
 import { getScenario } from '../api/scenario.js';
 import { formatManWon, isRainy, shortDate, toMan, weekdayOf } from '../utils/forecast.js';
+import { MODE_CHANGE_EVENT } from '../api/client.js';
 import ScenarioChart from '../components/scenario/ScenarioChart.jsx';
 
 const WORKERS_MIN = 5;
@@ -23,16 +24,25 @@ export default function ScenarioPage() {
   const [result, setResult] = useState(null);
   const [scenarioError, setScenarioError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
+    setForecast(null);
+    setResult(null);
     getForecast()
       .then((data) => alive && setForecast(data))
       .catch((e) => alive && setForecastError(e));
     return () => {
       alive = false;
     };
+  }, [reloadKey]);
+
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener(MODE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
   }, []);
 
   const days = forecast?.days ?? [];

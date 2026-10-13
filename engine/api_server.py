@@ -20,8 +20,14 @@ from scenario import compare as compare_scenario
 from chat_server import build_router as build_chat_router
 
 IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
+IDLE_FORECAST_DEMO = Path(__file__).resolve().parent.parent / "data" / "idle_forecast_demo.json"
 AUTH_MOCK = Path(__file__).resolve().parent / "auth_mock.json"
 ITERATIONS = 260_000
+
+
+def _forecast_path(mode: str | None) -> Path:
+    """mode=demo면 시연용 강수 주간(54인일), 아니면 실데이터(42인일)."""
+    return IDLE_FORECAST_DEMO if mode == "demo" else IDLE_FORECAST
 
 app = FastAPI(title="일손배정 AI API")
 app.add_middleware(
@@ -79,17 +85,25 @@ def logout(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_
 
 
 @app.get("/forecast")
-def get_forecast(_: Annotated[str, Depends(require_auth)]):
-    if not IDLE_FORECAST.exists():
+def get_forecast(
+    _: Annotated[str, Depends(require_auth)],
+    mode: str | None = None,
+):
+    path = _forecast_path(mode)
+    if not path.exists():
         raise HTTPException(
             status_code=503,
-            detail="forecast 미생성 — python3 forecast/idle.py 먼저 실행",
+            detail=f"forecast 미생성 — python3 forecast/idle.py{' --demo' if mode == 'demo' else ''} 먼저 실행",
         )
-    return json.loads(IDLE_FORECAST.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @app.get("/assignments")
-def get_assignments(date: str, _: Annotated[str, Depends(require_auth)]):
+def get_assignments(
+    date: str,
+    _: Annotated[str, Depends(require_auth)],
+    mode: str | None = None,  # 수용만 (배정은 requests.csv 기반이라 mode 무영향 — 일관성 유지용)
+):
     return assign(date)
 
 
@@ -98,9 +112,10 @@ def get_scenario(
     workers: int,
     _: Annotated[str, Depends(require_auth)],
     start: str | None = None,
+    mode: str | None = None,
 ):
     try:
-        return compare_scenario(workers, start)
+        return compare_scenario(workers, start, forecast_path=_forecast_path(mode))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
