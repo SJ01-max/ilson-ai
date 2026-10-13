@@ -3,8 +3,8 @@
 애드온 분리 원칙: ANTHROPIC_API_KEY 없으면 /chat만 503, 나머지 기능 무영향.
 숫자는 반드시 도구로 조회 — 모델이 지어내지 못하게 system prompt·tool schema로 유도.
 
-주의: 시연용 강수 주간 모드(?mode=demo)는 대시보드 전용이다 — 챗 도구는 항상 실데이터
-    (idle_forecast.json / scenario default) 를 참조하므로, 채팅 답변의 숫자는 UI 토글과 무관하다.
+mode 처리: 프론트가 ChatRequest.mode 로 'demo' 또는 None 을 보낸다. 서버가 파일을 결정하고
+    도구가 실행될 때만 선택된 forecast JSON 을 쓴다 — 모델에게 파일 선택권을 주지 않는다.
 """
 
 import json
@@ -24,12 +24,23 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 1000
 IDLE_FORECAST = Path(__file__).resolve().parent.parent / "data" / "idle_forecast.json"
+IDLE_FORECAST_DEMO = Path(__file__).resolve().parent.parent / "data" / "idle_forecast_demo.json"
 
-def _system_prompt() -> str:
+
+def _forecast_path(mode: str | None) -> Path:
+    return IDLE_FORECAST_DEMO if mode == "demo" else IDLE_FORECAST
+
+def _system_prompt(mode: str | None = None) -> str:
     from datetime import date
 
     today = date.today()
     weekday = "월화수목금토일"[today.weekday()]
+    demo_note = (
+        "현재 모드는 '시연 데이터 기준'이다. 답변의 어딘가에 '시연 데이터 기준' 이라는 표현을 자연스럽게 포함해, "
+        "담당자가 실데이터가 아닌 시연용 수치를 보고 있다는 사실을 인지하게 하라. "
+        if mode == "demo"
+        else ""
+    )
     return (
         "너는 양주시 공공형 계절근로 배정 시스템의 안내 담당자다. "
         "숫자는 반드시 도구를 호출해 얻고, 도구 범위 밖 질문엔 "
@@ -39,7 +50,8 @@ def _system_prompt() -> str:
         "연도 없이 '10월 14일' 같은 날짜가 주어지면 올해 또는 가장 가까운 미래 연도로 해석한다. "
         "유휴 예보 질문에는 먼저 get_idle_forecast를 호출하고, 질문의 기간 표현(다음 주/이번 주/이번 달 등)이 "
         "예보 기간과 달라도 거절하지 말 것. '현재 예보 기간은 M/D~M/D입니다'라고 밝힌 뒤 그 기간의 수치로 답할 것. "
-        "출력은 플레인 텍스트로만. 마크다운 금지(별표 **, 샵 #, 백틱 `, 하이픈 글머리표 모두 쓰지 말 것). "
+        + demo_note
+        + "출력은 플레인 텍스트로만. 마크다운 금지(별표 **, 샵 #, 백틱 `, 하이픈 글머리표 모두 쓰지 말 것). "
         "강조가 필요하면 숫자와 단위를 그대로 쓰고, 목록은 '1) 2) 3)' 또는 줄바꿈만 사용."
     )
 
@@ -87,19 +99,20 @@ TOOLS = [
 ]
 
 
-def _tool_get_idle_forecast() -> dict:
-    if not IDLE_FORECAST.exists():
+def _tool_get_idle_forecast(mode: str | None) -> dict:
+    path = _forecast_path(mode)
+    if not path.exists():
         return {"error": "forecast 미생성"}
-    return json.loads(IDLE_FORECAST.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _run_tool(name: str, args: dict) -> dict:
+def _run_tool(name: str, args: dict, mode: str | None) -> dict:
     if name == "get_idle_forecast":
-        return _tool_get_idle_forecast()
+        return _tool_get_idle_forecast(mode)
     if name == "get_assignments":
         return assign(args["date"])
     if name == "compare_scenario":
-        return compare_scenario(args["workers"], args.get("start"))
+        return compare_scenario(args["workers"], args.get("start"), forecast_path=_forecast_path(mode))
     return {"error": f"알 수 없는 도구: {name}"}
 
 
@@ -110,6 +123,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage]
+    mode: str | None = None  # 'demo' 면 시연용 강수 주간 JSON 참조. 모델이 아니라 서버가 결정.
 
 
 def _get_client():
@@ -128,6 +142,7 @@ def build_router(require_auth) -> APIRouter:
     @router.post("/chat")
     def chat(req: ChatRequest, _=Depends(require_auth)):
         client = _get_client()
+        mode = req.mode if req.mode == "demo" else None
 
         messages = [{"role": m.role, "content": m.content} for m in req.messages]
         tool_used: list[str] = []
@@ -139,7 +154,7 @@ def build_router(require_auth) -> APIRouter:
             resp = client.messages.create(
                 model=MODEL,
                 max_tokens=MAX_TOKENS,
-                system=_system_prompt(),
+                system=_system_prompt(mode),
                 tools=TOOLS,
                 messages=messages,
             )
@@ -170,7 +185,7 @@ def build_router(require_auth) -> APIRouter:
                     continue
                 tool_used.append(block.name)
                 try:
-                    result = _run_tool(block.name, block.input or {})
+                    result = _run_tool(block.name, block.input or {}, mode)
                     result_text = json.dumps(result, ensure_ascii=False)
                     is_error = False
                 except Exception as e:

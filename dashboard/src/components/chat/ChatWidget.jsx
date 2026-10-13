@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { postChat } from '../../api/chat.js';
-import { ApiError } from '../../api/client.js';
+import { ApiError, MODE_CHANGE_EVENT, getMode } from '../../api/client.js';
 
 const SUGGESTIONS = ['이번 주 유휴 이유는?', '내일 배정 알려줘', '15명으로 줄이면?'];
 
@@ -19,6 +19,16 @@ export default function ChatWidget() {
     }
   }, [open, messages, busy, error]);
 
+  // 토글이 바뀌면 이전 대화는 다른 데이터 기준이라 혼동 소지 — 초기화.
+  useEffect(() => {
+    const handler = () => {
+      setMessages([]);
+      setError(null);
+    };
+    window.addEventListener(MODE_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(MODE_CHANGE_EVENT, handler);
+  }, []);
+
   async function send(question) {
     const text = question.trim();
     if (!text || busy) return;
@@ -29,7 +39,7 @@ export default function ChatWidget() {
     setBusy(true);
     setError(null);
     try {
-      const data = await postChat(next);
+      const data = await postChat(next, { mode: getMode() });
       setMessages([...next, { role: 'assistant', content: data.reply || '(응답 없음)' }]);
     } catch (err) {
       const msg = err instanceof ApiError && err.status === 503
