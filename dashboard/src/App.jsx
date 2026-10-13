@@ -5,6 +5,7 @@ import AssignmentBoardPage from './pages/AssignmentBoardPage.jsx';
 import ScenarioPage from './pages/ScenarioPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import ChatWidget from './components/chat/ChatWidget.jsx';
+import ForecastBasis from './components/forecast/ForecastBasis.jsx';
 import { logout } from './api/auth.js';
 import { getDisplayName, getToken, UNAUTHORIZED_EVENT } from './api/client.js';
 
@@ -63,6 +64,7 @@ export default function App() {
             <span className="header-meta">
               {today}
             </span>
+            <ForecastBasis />
             <div className="mcp">
               <button
                 type="button"

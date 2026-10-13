@@ -81,7 +81,7 @@ export function buildHeadline(forecast, now = new Date()) {
         `유휴 인건비 환산액(예상) ${formatManWon(lossKrw)}`,
       ]
     : [
-        `${week} 강수 없음`,
+        '이번 예보 기간 강수 없음',
         `유휴 ${forecast?.week_total?.idle ?? 0}인일`,
         `유휴 인건비 환산액(예상) ${formatManWon(forecast?.week_total?.loss_krw ?? 0)}`,
       ];
