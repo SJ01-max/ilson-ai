@@ -40,7 +40,7 @@ export default function ForecastBasis() {
   }
 
   const label = forecast.generated_at
-    ? `예보 생성: ${formatGeneratedAt(forecast.generated_at)} · 기상청 단기예보`
-    : `예보 기준: ${shortDate(forecast.week_start)}`;
+    ? `예보 생성: ${formatGeneratedAt(forecast.generated_at)} · 기상청 단기·중기예보`
+    : `${shortDate(forecast.week_start)} 기준 시연 스냅샷`;
   return <span className="forecast-basis">{label}</span>;
 }
