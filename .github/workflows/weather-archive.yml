@@ -37,8 +37,9 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 적재 대상만 add (idle_forecast.json 자동 제외)
-          git add data/weather_history/ data/weekly_rain.csv
+          # 적재 대상만 add (idle_forecast.json 자동 제외). 파일명이 YYYY-MM-DD_HHMM.csv 로
+          # 바뀌어 같은 날 재실행에도 이전 스냅샷을 덮지 않는다 (QA-40).
+          git add data/weather_history/*.csv data/weekly_rain.csv
           if git diff --cached --quiet; then
             echo "변경 없음 — 커밋 스킵"
             exit 0
